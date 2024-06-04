@@ -27,6 +27,33 @@
       "compilerOptions": {
         "tsConfigPath": "apps/user-service/tsconfig.app.json"
       }
+    },
+    "notification": {
+      "type": "application",
+      "root": "apps/notification",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification/tsconfig.app.json"
+      }
+    },
+    "trip": {
+      "type": "application",
+      "root": "apps/trip",
+      "entryFile": "main",
+      "sourceRoot": "apps/trip/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/trip/tsconfig.app.json"
+      }
+    },
+    "driver": {
+      "type": "application",
+      "root": "apps/driver",
+      "entryFile": "main",
+      "sourceRoot": "apps/driver/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/driver/tsconfig.app.json"
+      }
     }
   }
 }

@@ -14,7 +14,7 @@ import { AuthController } from './auth.controller';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1h' },
     }),
-    UserServiceModule,
+    UserServiceModule
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
