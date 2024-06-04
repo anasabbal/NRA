@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/nuber-app/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/nuber-app/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/nuber-app",
+  "projects": {
+    "nuber-app": {
+      "type": "application",
+      "root": "apps/nuber-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/nuber-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/nuber-app/tsconfig.app.json"
+      }
+    },
+    "user-service": {
+      "type": "application",
+      "root": "apps/user-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/user-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user-service/tsconfig.app.json"
+      }
+    }
+  }
+}
