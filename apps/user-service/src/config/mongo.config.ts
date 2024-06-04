@@ -1,12 +1,12 @@
-import { ConfigService } from "@nestjs/config";
 import { ConnectOptions } from "mongoose";
 
 
-const config = new ConfigService();
+
+const uriDb = 'mongodb+srv://anas:anas@cluster0.uy7csfj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
 
 export default {
-    uri: "mongodb+srv://user-service:anas13@cluster0.ekc9rnd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", // MongoDB connection URI
+    uri: uriDb, // mongoDB connection URI
     options: {
       useNewUrlParser: true,
       useUnifiedTopology: true,
