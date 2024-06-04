@@ -1,3 +1,3 @@
-[submodule "mini-uber-microservice"]
+[submodule "java"]
 	path = java
 	url = https://github.com/anasabbal/mini-uber-microservice.git
