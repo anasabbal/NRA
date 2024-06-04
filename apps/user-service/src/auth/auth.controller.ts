@@ -1,20 +1,25 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginDto } from './interface/login.dto';
-import { JwtAuthGuard } from './jwt.guard';
+import { Controller, Logger } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { AuthService } from './auth.service'; 
+import { RegisterUserCommand } from './interface/register.command';
+import { User } from '../models/user.schema';
+import { LoginCommand } from './interface/login.command';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
+    private readonly logger = new Logger(AuthController.name);
+
     constructor(private readonly authService: AuthService) {}
 
-    @Post('login')
-    async login(@Request() req, @Body() loginDto: LoginDto) {
-        return this.authService.login(req.user);
+    @MessagePattern({ cmd: 'register' })
+    async register(@Payload() registerUserCommand: RegisterUserCommand): Promise<User> {
+        this.logger.log(`Received register command for: ${registerUserCommand.email}`);
+        return this.authService.register(registerUserCommand);
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    getProfile(@Request() req) {
-        return req.user;
+    @MessagePattern({ cmd: 'login' })
+    async login(@Payload() req: LoginCommand): Promise<any> {
+        this.logger.log(`Logging in user: ${req.email}`);
+        return this.authService.login(req);
     }
 }

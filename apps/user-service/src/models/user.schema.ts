@@ -30,9 +30,6 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: false })
-  clientId?: string;
-  
   @Prop({ required: true })
   password: string;
 }

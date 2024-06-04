@@ -1,29 +1,46 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { UserServiceService } from '../user-service.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../models/user.schema';
-import { JwtPayload } from './interface/jwt-payload.interface';
+import * as bcrypt from 'bcrypt';
+import { RegisterUserCommand } from './interface/register.command';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class AuthService {
+
+    private readonly logger = new Logger(AuthService.name);
+
+
     constructor(
         @Inject(forwardRef(() => UserServiceService))
         private usersService: UserServiceService,
         private jwtService: JwtService,
     ){}
 
-    async validateUser(username: string, password: string): Promise<User | null> {
-        const user = await this.usersService.findOne(username);
-        if (user && user.password === password) {
-          return user;
+    async register(req: RegisterUserCommand): Promise<User> {
+        const errors = await validate(req);
+        if (errors.length > 0) {
+          throw new BadRequestException(errors);
         }
-        return null;
-      }
-    
-      async login(user: User): Promise<{ access_token: string }> {
-        const payload: JwtPayload = { username: user.email, sub: user.userId };
+        try {
+          this.logger.log(`Registering user: ${req.email}`);
+          const hashedPassword = await bcrypt.hash(req.password, 10);
+          const newUser = this.usersService.create({ email: req.email, password: hashedPassword });
+          this.logger.log(`User registered successfully: ${req.email}`);
+          return newUser;
+        } catch (error) {
+          this.logger.error(`Failed to register user: ${req.email}`, error.stack);
+          throw error;
+        }
+    }
+    async login(user: any) {
+        this.logger.log(`Generating JWT token for user: ${user.username}`);
+        const payload = { username: user.username, sub: user.id };
+        const token = this.jwtService.sign(payload);
+        this.logger.log(`JWT token generated successfully for user: ${user.username}`);
         return {
-          access_token: this.jwtService.sign(payload),
+          access_token: token,
         };
       }
 }
