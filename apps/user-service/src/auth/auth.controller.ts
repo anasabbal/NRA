@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { RegisterUserCommand } from './interface/register.command';
 import { User } from '../models/user.schema';
 import { LoginCommand } from './interface/login.command';
+import { get } from 'http';
 
 @Controller()
 export class AuthController {

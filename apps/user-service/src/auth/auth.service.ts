@@ -19,14 +19,14 @@ export class AuthService {
     ){}
 
     async register(req: RegisterUserCommand): Promise<User> {
-        const errors = await validate(req);
+        /*const errors = await validate(req);
         if (errors.length > 0) {
           throw new BadRequestException(errors);
-        }
+        }*/
         try {
           this.logger.log(`Registering user: ${req.email}`);
           const hashedPassword = await bcrypt.hash(req.password, 10);
-          const newUser = this.usersService.create({ email: req.email, password: hashedPassword });
+          const newUser = await this.usersService.create(req); // await here
           this.logger.log(`User registered successfully: ${req.email}`);
           return newUser;
         } catch (error) {
@@ -35,12 +35,13 @@ export class AuthService {
         }
     }
     async login(user: any) {
-        this.logger.log(`Generating JWT token for user: ${user.username}`);
-        const payload = { username: user.username, sub: user.id };
+        this.logger.log(`Generating JWT token for user: ${user.email}`);
+        const payload = { email: user.email, sub: user.id };
         const token = this.jwtService.sign(payload);
-        this.logger.log(`JWT token generated successfully for user: ${user.username}`);
+        this.logger.log(`JWT token generated successfully for user: ${user.email}`);
         return {
           access_token: token,
         };
       }
 }
+
