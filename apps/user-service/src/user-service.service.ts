@@ -25,23 +25,6 @@ export class UserServiceService {
     });
     return await newUser.save();
   }
-
-  async validateUser(username: string, password: string): Promise<any> {
-    try {
-      this.logger.log(`Validating user: ${username}`);
-      const user = await this.userModel.findOne({ where: { username } });
-      if (user && await bcrypt.compare(password, user.password)) {
-        const { password, ...result } = user;
-        this.logger.log(`User validated successfully: ${username}`);
-        return result;
-      }
-      this.logger.warn(`Invalid credentials for user: ${username}`);
-      return null;
-    } catch (error) {
-      this.logger.error(`Error validating user: ${username}`, error.stack);
-      throw error;
-    }
-  }
   async getById(userId: string): Promise<User> {
     try {
       this.logger.log(`Fetching user by ID: ${userId}`);

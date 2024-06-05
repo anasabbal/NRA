@@ -19,10 +19,10 @@ export class AuthService {
     ){}
 
     async register(req: RegisterUserCommand): Promise<User> {
-        /*const errors = await validate(req);
+        const errors = await validate(req);
         if (errors.length > 0) {
           throw new BadRequestException(errors);
-        }*/
+        }
         try {
           this.logger.log(`Registering user: ${req.email}`);
           const hashedPassword = await bcrypt.hash(req.password, 10);
@@ -41,7 +41,8 @@ export class AuthService {
         this.logger.log(`JWT token generated successfully for user: ${user.email}`);
         return {
           access_token: token,
+          email: user.email
         };
-      }
+    }
 }
 

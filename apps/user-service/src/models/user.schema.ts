@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 export type UserDocument = User & Document;
 
@@ -12,21 +12,16 @@ export type UserDocument = User & Document;
   timestamps: true,
 })
 export class User {
-  @Prop({
-    type: String,
-    unique: true,
-    default: function genUUID() {
-      return uuid();
-    },
-  })
-  userId: string;
-
+  @Prop({ required: true })
   firstName: string;
 
+  @Prop({ required: true })
   lastName: string;
 
+  @Prop({ required: true, unique: true })
   email: string;
 
+  @Prop({ required: true })
   password: string;
 }
 
