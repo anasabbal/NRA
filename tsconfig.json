@@ -17,6 +17,13 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {}
+    "paths": {
+      "@app/user-events": [
+        "libs/user-events/src"
+      ],
+      "@app/user-events/*": [
+        "libs/user-events/src/*"
+      ]
+    }
   }
 }

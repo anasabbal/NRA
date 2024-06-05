@@ -1,8 +1,9 @@
+import { IsEqualTo } from '@app/user-events';
 import { IsString, IsEmail, MinLength, MaxLength } from 'class-validator';
-import { IsEqualTo } from '../utils';
 
 
-export class RegisterUserCommand {
+
+export class UserCreateCommand {
   @IsString()
   @MaxLength(50)
   firstName: string;

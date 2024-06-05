@@ -3,7 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './models/user.schema';
 import * as bcrypt from 'bcrypt';
-import { RegisterUserCommand } from './auth/interface/register.command';
+import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
+import { GetUserEvent } from '@app/user-events/user/event/user.get';
+
 
 @Injectable()
 export class UserServiceService {
@@ -14,7 +16,7 @@ export class UserServiceService {
     @InjectModel('User') private readonly userModel: Model<User>
   ) {}
 
-  async create(command: RegisterUserCommand): Promise<User> {
+  async create(command: UserCreateCommand): Promise<User> {
     this.logger.log(`Creating user: ${command.email}`);
     const hashedPassword = await bcrypt.hash(command.password, 10);
     const newUser = new this.userModel({ 
@@ -25,7 +27,7 @@ export class UserServiceService {
     });
     return await newUser.save();
   }
-  async getById(userId: string): Promise<User> {
+  async getById(userId: string): Promise<GetUserEvent> {
     try {
       this.logger.log(`Fetching user by ID: ${userId}`);
       const user = await this.userModel.findById(userId).exec();
@@ -39,7 +41,7 @@ export class UserServiceService {
       throw error;
     }
   }
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<GetUserEvent[]> {
     try {
       this.logger.log('Fetching all users');
       return await this.userModel.find().exec();

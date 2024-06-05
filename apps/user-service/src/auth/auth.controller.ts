@@ -1,10 +1,9 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service'; 
-import { RegisterUserCommand } from './interface/register.command';
 import { User } from '../models/user.schema';
-import { LoginCommand } from './interface/login.command';
-import { get } from 'http';
+import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
+import { UserLoginCmd } from '@app/user-events/user/cmd/user.login.cmd';
 
 @Controller()
 export class AuthController {
@@ -13,13 +12,13 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @MessagePattern({ cmd: 'register' })
-    async register(@Payload() registerUserCommand: RegisterUserCommand): Promise<User> {
+    async register(@Payload() registerUserCommand: UserCreateCommand): Promise<User> {
         this.logger.log(`Received register command for: ${registerUserCommand.email}`);
         return this.authService.register(registerUserCommand);
     }
 
     @MessagePattern({ cmd: 'login' })
-    async login(@Payload() req: LoginCommand): Promise<any> {
+    async login(@Payload() req: UserLoginCmd): Promise<any> {
         this.logger.log(`Logging in user: ${req.email}`);
         return this.authService.login(req);
     }

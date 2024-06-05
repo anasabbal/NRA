@@ -9,7 +9,7 @@ import { UserService } from '../services/user-service';
 export class AuthController {
   constructor(private readonly userService: UserService) {}
 
-  
+
   @Post('register')
   async register(@Body() createUserDto: any) {
     return this.userService.register(createUserDto);
@@ -18,9 +18,5 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginUserDto: any) {
       return this.userService.login(loginUserDto);
-  }
-  @Get()
-  async get(){
-    return "Hello Word";
   }
 }

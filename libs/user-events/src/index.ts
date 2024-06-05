@@ -1,3 +1,7 @@
+export * from './user-events.module';
+export * from './user-events.service';
+
+
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
 
 export function IsEqualTo(property: string, validationOptions?: ValidationOptions) {
@@ -18,3 +22,4 @@ export function IsEqualTo(property: string, validationOptions?: ValidationOption
     });
   };
 }
+

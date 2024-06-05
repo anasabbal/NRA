@@ -1,3 +1,5 @@
+import { GetUserEvent } from "@app/user-events/user/event/user.get";
+import { mapDto } from "@app/user-events/utils";
 import { BadRequestException, Body, ConflictException, Inject, Injectable, InternalServerErrorException, Post, UnauthorizedException } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 
@@ -46,18 +48,6 @@ export class UserService {
             }
         }
     }
-
-    async get(): Promise<string> {
-        try {
-            const message = await this.authClient.send({ cmd: 'get' }, null).toPromise();
-            return message;
-        } catch (error) {
-            // log the error for debugging purposes
-            console.error('Error occurred during data fetch:', error);
-            // if the error is unexpected, throw an Internal Server Error
-            throw new InternalServerErrorException('Failed to fetch data');
-        }
-    }
     async getAll(): Promise<any[]> {
         try {
             const users = await this.authClient.send({ cmd: 'get_all_users' }, null).toPromise();
@@ -68,9 +58,10 @@ export class UserService {
         }
     }
 
-    async getById(userId: string): Promise<any> {
+    async getById(userId: string): Promise<GetUserEvent> {
         try {
             const user = await this.authClient.send({ cmd: 'get_user_by_id' }, userId).toPromise();
+            //const target: GetUserEvent = mapDto<any, GetUserEvent>(user);
             return user;
         } catch (error) {
             console.error(`Error occurred while fetching user with ID ${userId}:`, error);

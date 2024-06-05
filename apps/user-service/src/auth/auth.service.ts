@@ -3,8 +3,8 @@ import { UserServiceService } from '../user-service.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../models/user.schema';
 import * as bcrypt from 'bcrypt';
-import { RegisterUserCommand } from './interface/register.command';
 import { validate } from 'class-validator';
+import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +18,7 @@ export class AuthService {
         private jwtService: JwtService,
     ){}
 
-    async register(req: RegisterUserCommand): Promise<User> {
+    async register(req: UserCreateCommand): Promise<User> {
         const errors = await validate(req);
         if (errors.length > 0) {
           throw new BadRequestException(errors);
