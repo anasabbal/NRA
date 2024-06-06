@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
 import { GetUserEvent } from '@app/user-events/user/event/user.get';
 import { UserType } from './models/user.type';
+import { DriverCreateCmd } from '@app/user-events/driver/cmd/driver.create.cmd';
 
 
 @Injectable()
@@ -48,8 +49,15 @@ export class UserServiceService {
     }
   }
 
-  async create(userTypeId: string, command: UserCreateCommand): Promise<User> {
+  async index(userTypeId: string): Promise<any>{
+    
+  }
+
+  async create(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<User> {
     const userType = await this.findUserTypeById(userTypeId);
+    if(userType.type === 'driver'){
+
+    }
     this.logger.log(`Begin creating user: ${command.email}`);
     const hashedPassword = await bcrypt.hash(command.password, 10);
     const newUser = new this.userModel({ 

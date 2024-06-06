@@ -31,8 +31,4 @@ export class UserCreateCommand {
   @MaxLength(20)
   @IsEqualTo('password', { message: 'Passwords must match' }) // Use the custom validator
   confirmPassword: string;
-
-  @IsString()
-  @IsIn([UserType.DRIVER, UserType.RIDER], { message: 'User type must be either Driver or User' }) // Validation for userType
-  userType: UserType;
 }

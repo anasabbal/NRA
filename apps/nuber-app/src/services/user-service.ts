@@ -1,3 +1,4 @@
+import { DriverCreateCmd } from "@app/user-events/driver/cmd/driver.create.cmd";
 import { UserCreateCommand } from "@app/user-events/user/cmd/user.create.cmd";
 import { GetUserEvent } from "@app/user-events/user/event/user.get";
 import { BadRequestException, Body, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, Post, UnauthorizedException } from "@nestjs/common";
@@ -12,17 +13,20 @@ export class UserService {
 
     constructor(
         @Inject('USER_SERVICE') private readonly authClient: ClientProxy,
+        @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
     ) {}
 
-    async register(userTypeId: string, createUserDto: UserCreateCommand): Promise<string> {
-        try {    
-            const paylod = {userTypeId, createUserDto};
-
-            const user = await this.authClient.send({ cmd: 'register' }, { userTypeId, command: createUserDto }).toPromise();
-          return user; // assuming the 'register' method returns a string
+    async register(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<string> {
+        try {
+          if(userTypeId === 'driver'){
+            return await this.driverClient.send({ cmd: 'create-driver' }, command).toPromise();
+          }else {
+            return await this.authClient.send({ cmd: 'register' }, { userTypeId, command: command }).toPromise();
+          }
+          
         } catch (error) {
           // log the error for debugging purposes
-          console.error('AAAAAA Error occurred during user registration:', error);
+          console.error('Error occurred during user registration:', error);
           
           // decide how to handle different types of errors
           if (error.response && error.response.status === 409) {

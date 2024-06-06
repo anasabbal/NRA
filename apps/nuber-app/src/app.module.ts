@@ -17,6 +17,14 @@ import { AuthController } from './rest/auth.controller';
           port: 3001, // port of user-service
         },
       },
+      {
+        name: 'DRIVER_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 3002, // port of user-service
+        },
+      },
     ]),
   ],
   controllers: [AuthController, UserController],

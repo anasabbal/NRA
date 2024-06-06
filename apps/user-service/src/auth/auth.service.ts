@@ -24,9 +24,7 @@ export class AuthService {
           throw new BadRequestException(errors);
         }
         try {
-          this.logger.log(`Registering user: ${command.email}`);
           const newUser = await this.usersService.create(userTypeId, command); // await here
-          this.logger.log(`User registered successfully: ${command.email}`);
           return newUser;
         } catch (error) {
           this.logger.error(`Failed to register user: ${command.email}`, error.stack);

@@ -8,8 +8,8 @@ import { GetUserEvent } from "@app/user-events/user/event/user.get";
 
 @Controller('users')
 export class UserController {
+  
   constructor(private readonly userService: UserService) {}
-
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })

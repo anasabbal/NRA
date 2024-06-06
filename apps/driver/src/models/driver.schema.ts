@@ -13,7 +13,6 @@ export type DriverDocument = Driver & Document;
     timestamps: true,
 })
 export class Driver {
-    driverId: string;
 
     @Prop({ required: true})
     licenceNumber: string;
@@ -34,9 +33,6 @@ export class Driver {
         ]
     })
     driverStatus: DriverStatus;
-
-    
-    userId: string;
 }
 
 export const DriverSchema = SchemaFactory.createForClass(Driver);
