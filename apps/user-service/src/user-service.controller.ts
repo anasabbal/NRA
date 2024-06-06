@@ -9,7 +9,7 @@ export class UserServiceController {
   constructor(private readonly userService: UserServiceService) {}
 
   @MessagePattern({ cmd: 'get_all_users' })
-  async getAllUsers(): Promise<GetUserEvent[]> {
+  async getAllUsers(): Promise<User[]> {
     return await this.userService.getAll();
   }
 

@@ -18,19 +18,18 @@ export class AuthService {
         private jwtService: JwtService,
     ){}
 
-    async register(req: UserCreateCommand): Promise<User> {
-        const errors = await validate(req);
+    async register(userTypeId: string, command: UserCreateCommand): Promise<User> {
+        const errors = await validate(command);
         if (errors.length > 0) {
           throw new BadRequestException(errors);
         }
         try {
-          this.logger.log(`Registering user: ${req.email}`);
-          const hashedPassword = await bcrypt.hash(req.password, 10);
-          const newUser = await this.usersService.create(req); // await here
-          this.logger.log(`User registered successfully: ${req.email}`);
+          this.logger.log(`Registering user: ${command.email}`);
+          const newUser = await this.usersService.create(userTypeId, command); // await here
+          this.logger.log(`User registered successfully: ${command.email}`);
           return newUser;
         } catch (error) {
-          this.logger.error(`Failed to register user: ${req.email}`, error.stack);
+          this.logger.error(`Failed to register user: ${command.email}`, error.stack);
           throw error;
         }
     }

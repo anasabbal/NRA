@@ -1,7 +1,13 @@
 import { IsEqualTo } from '@app/user-events';
-import { IsString, IsEmail, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsEmail, MinLength, MaxLength, IsEnum, IsIn } from 'class-validator';
 
 
+
+enum UserType {
+  DRIVER = 'driver',
+  RIDER = 'rider',
+  ADMIN = 'admin',
+}
 
 export class UserCreateCommand {
   @IsString()
@@ -25,4 +31,8 @@ export class UserCreateCommand {
   @MaxLength(20)
   @IsEqualTo('password', { message: 'Passwords must match' }) // Use the custom validator
   confirmPassword: string;
+
+  @IsString()
+  @IsIn([UserType.DRIVER, UserType.RIDER], { message: 'User type must be either Driver or User' }) // Validation for userType
+  userType: UserType;
 }

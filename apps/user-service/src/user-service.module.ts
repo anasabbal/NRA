@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Inject, Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
 import { UserServiceController } from './user-service.controller';
 import { UserServiceService } from './user-service.service';
 import { DatabaseModule } from './database/database.module';
@@ -11,10 +11,29 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     MongooseModule.forFeature(forFeatureDb),
     DatabaseModule,
-    forwardRef(() =>AuthModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [UserServiceController],
-  providers: [UserServiceService], // Make sure UserServiceService is provided here
-  exports: [UserServiceService], // Also, make sure it's exported
+  providers: [UserServiceService], // Provided here
+  exports: [UserServiceService], // Also exported here
 })
-export class UserServiceModule {}
+export class UserServiceModule implements OnModuleInit{
+
+  private readonly logger = new Logger(UserServiceModule.name);
+
+  constructor(
+    private readonly userService : UserServiceService
+  ) {}
+  
+    async onModuleInit() {
+      try {
+        this.logger.log(`Begin init the UserType`);
+        await this.seedUserTypes();
+      } catch (error) {
+        this.logger.error(`Error while init User Type error: ${error}`);
+      }
+    }
+    private async seedUserTypes() {
+      this.userService.seedUserTypes();
+    }
+}
