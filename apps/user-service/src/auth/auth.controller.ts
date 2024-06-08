@@ -1,9 +1,9 @@
-import { Controller, Logger } from '@nestjs/common';
-import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import { Controller, Logger, Request, UseGuards } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service'; 
-import { User } from '../models/user.schema';
 import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
 import { UserLoginCmd } from '@app/user-events/user/cmd/user.login.cmd';
+import { JwtAuthGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -29,5 +29,12 @@ export class AuthController {
     async login(@Payload() req: UserLoginCmd): Promise<any> {
         this.logger.log(`Logging in user: ${req.email}`);
         return this.authService.login(req);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @MessagePattern({cmd: 'profile'})
+    async getProfile(@Request() req) :Promise<any>{
+        this.logger.log(`Request is: ${req}`);
+        return req.user;
     }
 }

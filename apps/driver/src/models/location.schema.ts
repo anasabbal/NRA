@@ -1,14 +1,18 @@
-
-
-
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 
 
-@Schema()
-export class Location extends Document {
+export type LocationDocument = Location & Document;
+
+@Schema({
+    toJSON: {
+        getters: true,
+        virtuals: true,
+    },
+    timestamps: true,
+})
+export class Location {
     @Prop({ required: true })
     userId: string;
 

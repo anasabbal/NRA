@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { DriverStatus, DriverStatusType } from "../enums/driver.status";
+import { Vehicle } from "./vehicle.schema";
+import { Types } from "mongoose";
 
 
 export type DriverDocument = Driver & Document;
@@ -26,15 +28,9 @@ export class Driver {
     @Prop({ required: true })
     password: string;
 
-    @Prop({ required: true})
-    licenceNumber: string;
-
-    @Prop({ required: true})
-    carModel: string;
-
-    @Prop({ required: true})
-    carPlateNumber: string;
-
+    @Prop({ type: [Types.ObjectId], ref: 'Vehicle' })
+    vehicles: Types.ObjectId[];
+    
     @Prop({
         type: String, 
         enum: [
@@ -45,6 +41,9 @@ export class Driver {
         ]
     })
     driverStatus: DriverStatus;
+
+    @Prop({ default: false })
+    isActive: boolean;
 }
 
 export const DriverSchema = SchemaFactory.createForClass(Driver);

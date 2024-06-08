@@ -38,9 +38,6 @@ export class DriverService {
       password: hashedPassword,
       firstName: driverCmd.firstName,
       lastName: driverCmd.lastName,
-      licenceNumber: driverCmd.licenceNumber,
-      carModel: driverCmd.carModel,
-      carPlateNumber: driverCmd.carPlateNumber,
       driverStatus: DriverStatus.EMPTY,
     };
   }

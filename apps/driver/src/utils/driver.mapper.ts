@@ -8,9 +8,6 @@ export function mapDriverToDto(driver: Driver): DriverDto {
     driverDto.lastName = driver.lastName;
     driverDto.email = driver.email;
     driverDto.password = driver.password;
-    driverDto.licenceNumber = driver.licenceNumber;
-    driverDto.carModel = driver.carModel;
-    driverDto.carPlateNumber = driver.carPlateNumber;
     driverDto.driverStatus = driver.driverStatus;
   
     return driverDto;

@@ -13,13 +13,13 @@ export class UserService {
     private readonly logger = new Logger(UserService.name);
 
     constructor(
-        @Inject('USER_SERVICE') private readonly authClient: ClientProxy,
+        @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
         @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
     ) {}
 
     async findUserTypeById(userTypeId: string): Promise<UserTypeDto> {
       try {
-        const userType = await this.authClient.send({ cmd: 'get_user_type__by_id' }, userTypeId).toPromise();
+        const userType = await this.userClient.send({ cmd: 'get_user_type__by_id' }, userTypeId).toPromise();
         this.logger.log(`User type with payload ${JSON.stringify(userType)} found`);
         return userType;
       }catch (error) {
@@ -45,7 +45,7 @@ export class UserService {
           if(userType.id == userTypeId){
             return await this.driverClient.send({ cmd: 'create' }, command).toPromise();
           }else {
-            return await this.authClient.send({ cmd: 'register' }, { userTypeId, command: command }).toPromise();
+            return await this.userClient.send({ cmd: 'register' }, { userTypeId, command: command }).toPromise();
           }
         } catch (error) {
           // log the error for debugging purposes
@@ -65,7 +65,7 @@ export class UserService {
 
     async login(loginUserDto: any): Promise<any> {
         try {
-            const result = await this.authClient.send({ cmd: 'login' }, loginUserDto).toPromise();
+            const result = await this.userClient.send({ cmd: 'login' }, loginUserDto).toPromise();
             return result;
         } catch (error) {
             // log the error for debugging purposes
@@ -83,7 +83,7 @@ export class UserService {
     async getAll(): Promise<any[]> {
         try {
           // dend the message to the auth client to fetch all users
-          const users = await this.authClient.send({ cmd: 'get_all_users'}, null).toPromise();
+          const users = await this.userClient.send({ cmd: 'get_all_users'}, null).toPromise();
           
           // ensure that the response is an array
           if (!Array.isArray(users)) {
@@ -99,13 +99,16 @@ export class UserService {
 
     async getById(userId: string): Promise<GetUserEvent> {
         try {
-            const user = await this.authClient.send({ cmd: 'get_user_by_id' }, userId).toPromise();
+            const user = await this.userClient.send({ cmd: 'get_user_by_id' }, userId).toPromise();
             //const target: GetUserEvent = mapDto<any, GetUserEvent>(user);
             return user;
         } catch (error) {
             console.error(`Error occurred while fetching user with ID ${userId}:`, error);
             throw new InternalServerErrorException(`Failed to fetch user with ID ${userId}`);
         }
+    }
+    async getCurrentProfile() {
+      return this.userClient.send({ cmd: 'profile' }, {}).toPromise();
     }
 }
 

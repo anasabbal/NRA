@@ -20,18 +20,6 @@ export class DriverDto {
   password: string;
 
   @IsNotEmpty()
-  @IsString()
-  licenceNumber: string;
-
-  @IsNotEmpty()
-  @IsString()
-  carModel: string;
-
-  @IsNotEmpty()
-  @IsString()
-  carPlateNumber: string;
-
-  @IsNotEmpty()
   @IsEnum(DriverStatus)
   driverStatus: DriverStatus;
 }

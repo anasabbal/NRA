@@ -19,7 +19,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get by id' })
+  @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') userId: string): Promise<GetUserEvent> {
     const user = await this.userService.getById(userId);
     if (!user) {
@@ -28,12 +28,17 @@ export class UserController {
     return user;
   }
   @Get('type/:id')
-  @ApiOperation({ summary: 'Get by id' })
+  @ApiOperation({ summary: 'Get User Type by id' })
   async getUserTypeById(@Param('id') userTypeById: string): Promise<UserTypeDto> {
     const user = await this.userService.findUserTypeById(userTypeById);
     if (!user) {
       throw new NotFoundException(`User type with ID ${userTypeById} not found`);
     }
     return user;
+  }
+  @Get('profile')
+  @ApiOperation({ summary: 'Get current user' })
+  async getCurrentUser(): Promise<any> {
+    return this.userService.getCurrentProfile();
   }
 }
