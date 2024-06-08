@@ -15,7 +15,7 @@ export class AuthService {
     constructor(
         @Inject(forwardRef(() => UserServiceService))
         private usersService: UserServiceService,
-        private jwtService: JwtService,
+        private jwtService: JwtService
     ){}
 
     async register(userTypeId: string, command: UserCreateCommand): Promise<User> {

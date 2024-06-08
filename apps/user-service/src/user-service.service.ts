@@ -47,6 +47,7 @@ export class UserServiceService {
         id : userType.id,
         name: userType.type
       };
+
       return result;
     } catch (error) {
       // handle errors (e.g., log error, throw custom exception)
@@ -57,20 +58,46 @@ export class UserServiceService {
 
   async create(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<User> {
     const userType = await this.findUserTypeById(userTypeId);
-    if(userType.name === 'driver'){
-
-    }
-    this.logger.log(`Begin creating user: ${command.email}`);
-    const hashedPassword = await bcrypt.hash(command.password, 10);
-    const newUser = new this.userModel({ 
-      email: command.email, 
-      password: hashedPassword, 
-      firstName: command.firstName, 
-      lastName: command.lastName,
-      userType: userType
-    });
-    return await newUser.save();
+    const hashedPassword = await this.hashPassword(command.password);
+    const newUser = this.createUser(command, hashedPassword, userType);
+    return await this.saveUser(newUser);
   }
+  private async hashPassword(password: string): Promise<string> {
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('Password hashed successfully');
+      return hashedPassword;
+    } catch (error) {
+      console.error('Error hashing password:', error);
+      throw error;
+    }
+  }
+  
+  private createUser(command: UserCreateCommand | DriverCreateCmd, hashedPassword: string, userType: UserTypeDto | null): User {
+    try {
+      if (!userType || !userType.name) {
+        throw new Error('User type not found');
+      }
+      const { email, firstName, lastName } = command;
+      console.log('Creating user instance');
+      return new this.userModel({ email, password: hashedPassword, firstName, lastName, userType });
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+  }
+  
+  private async saveUser(user: User): Promise<User> {
+    try {
+      const savedUser = await user.save();
+      console.log('User saved successfully');
+      return savedUser;
+    } catch (error) {
+      console.error('Error saving user:', error);
+      throw error;
+    }
+  }
+  
   async getById(userId: string): Promise<GetUserEvent> {
     try {
       this.logger.log(`Fetching user by ID: ${userId}`);
@@ -85,7 +112,6 @@ export class UserServiceService {
       throw error;
     }
   }
-  
   async getAll(): Promise<User[]> {
     const users = await this.userModel.find();
     return users;
