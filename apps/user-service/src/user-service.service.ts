@@ -7,6 +7,7 @@ import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
 import { GetUserEvent } from '@app/user-events/user/event/user.get';
 import { UserType } from './models/user.type';
 import { DriverCreateCmd } from '@app/user-events/driver/cmd/driver.create.cmd';
+import { UserTypeDto } from '@app/user-events/user/event/user.type.dto';
 
 
 @Injectable()
@@ -39,9 +40,14 @@ export class UserServiceService {
       console.error('Error seeding user types:', error);
     }
   }
-  async findUserTypeById(userTypeId: string): Promise<UserType | null> {
+  async findUserTypeById(userTypeId: string): Promise<UserTypeDto | null> {
     try {
-      return await this.userTypeModel.findById(userTypeId).exec();
+      const userType = await this.userTypeModel.findById(userTypeId).exec();
+      const result = {
+        id : userType.id,
+        name: userType.type
+      };
+      return result;
     } catch (error) {
       // handle errors (e.g., log error, throw custom exception)
       console.error('Error finding user type by ID:', error);
@@ -49,13 +55,9 @@ export class UserServiceService {
     }
   }
 
-  async index(userTypeId: string): Promise<any>{
-    
-  }
-
   async create(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<User> {
     const userType = await this.findUserTypeById(userTypeId);
-    if(userType.type === 'driver'){
+    if(userType.name === 'driver'){
 
     }
     this.logger.log(`Begin creating user: ${command.email}`);

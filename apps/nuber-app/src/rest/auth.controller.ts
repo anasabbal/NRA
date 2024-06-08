@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from '../services/user-service';
 import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
+import { DriverCreateCmd } from '@app/user-events/driver/cmd/driver.create.cmd';
 
 
 
@@ -12,7 +13,7 @@ export class AuthController {
 
 
   @Post('register/:userTypeId')
-  async register(@Body() createUserDto: UserCreateCommand,
+  async register(@Body() createUserDto: UserCreateCommand | DriverCreateCmd,
                  @Param('userTypeId') userTypeId: string
                 ) {
     return this.userService.register(userTypeId,createUserDto);

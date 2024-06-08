@@ -2,6 +2,7 @@ import { ApiOperation } from "@nestjs/swagger";
 import { UserService } from "../services/user-service";
 import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
 import { GetUserEvent } from "@app/user-events/user/event/user.get";
+import { UserTypeDto } from "@app/user-events/user/event/user.type.dto";
 
 
 
@@ -23,6 +24,15 @@ export class UserController {
     const user = await this.userService.getById(userId);
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return user;
+  }
+  @Get('type/:id')
+  @ApiOperation({ summary: 'Get by id' })
+  async getUserTypeById(@Param('id') userTypeById: string): Promise<UserTypeDto> {
+    const user = await this.userService.findUserTypeById(userTypeById);
+    if (!user) {
+      throw new NotFoundException(`User type with ID ${userTypeById} not found`);
     }
     return user;
   }
