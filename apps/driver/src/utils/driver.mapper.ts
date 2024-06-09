@@ -13,4 +13,4 @@ export function mapDriverToDto(driver: Driver): DriverDto {
     driverDto.driverStatus = driver.driverStatus;
   
     return driverDto;
-  }
+}
