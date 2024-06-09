@@ -3,10 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { Driver } from './models/driver.schema';
-import { DriverCreateCmd } from '@app/user-events/driver/cmd/driver.create.cmd';
 import { DriverStatus } from './enums/driver.status';
-import { DriverDto } from '@app/user-events/driver/event/driver.dto';
 import { mapDriverToDto } from './utils/driver.mapper';
+import { DriverCreateCmd } from '@app/common/driver/cmd/driver.create.cmd';
+import { DriverDto } from '@app/common/driver/event/driver.dto';
 
 @Injectable()
 export class DriverService {

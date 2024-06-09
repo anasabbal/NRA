@@ -1,4 +1,4 @@
-import { DriverDto } from "@app/user-events/driver/event/driver.dto";
+import { DriverDto } from "@app/common/driver/event/driver.dto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 

@@ -1,5 +1,7 @@
-import { DriverDto } from "@app/user-events/driver/event/driver.dto";
+import { DriverDto } from "@app/common/driver/event/driver.dto";
 import { Driver } from "../models/driver.schema";
+
+
 
 export function mapDriverToDto(driver: Driver): DriverDto {
     const driverDto = new DriverDto();
