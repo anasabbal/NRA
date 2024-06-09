@@ -55,13 +55,13 @@
         "tsConfigPath": "apps/driver/tsconfig.app.json"
       }
     },
-    "user-events": {
+    "common": {
       "type": "library",
-      "root": "libs/user-events",
+      "root": "libs/common",
       "entryFile": "index",
-      "sourceRoot": "libs/user-events/src",
+      "sourceRoot": "libs/common/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/user-events/tsconfig.lib.json"
+        "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
     }
   }

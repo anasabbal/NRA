@@ -40,7 +40,6 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "user-events": "^0.0.6",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -87,7 +86,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/user-events(|/.*)$": "<rootDir>/libs/user-events/src/$1"
+      "^@app/user-events(|/.*)$": "<rootDir>/libs/user-events/src/$1",
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
     }
   }
 }

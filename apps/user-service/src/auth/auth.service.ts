@@ -4,7 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../models/user.schema';
 import * as bcrypt from 'bcrypt';
 import { validate } from 'class-validator';
-import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
+import { UserCreateCommand } from '@app/common/user/cmd/user.create.cmd';
+
 
 @Injectable()
 export class AuthService {

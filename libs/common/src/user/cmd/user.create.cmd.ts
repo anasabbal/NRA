@@ -1,5 +1,6 @@
-import { IsEqualTo } from '@app/user-events';
+import { IsEqualTo } from '@app/common/utils';
 import { IsString, IsEmail, MinLength, MaxLength, IsEnum, IsIn } from 'class-validator';
+
 
 
 

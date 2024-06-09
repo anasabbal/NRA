@@ -23,6 +23,12 @@
       ],
       "@app/user-events/*": [
         "libs/user-events/src/*"
+      ],
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
       ]
     }
   }

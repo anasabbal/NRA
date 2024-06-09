@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from '../services/user-service';
-import { UserCreateCommand } from '@app/user-events/user/cmd/user.create.cmd';
-import { DriverCreateCmd } from '@app/user-events/driver/cmd/driver.create.cmd';
+import { DriverCreateCmd } from "@app/common/driver/cmd/driver.create.cmd";
+import { UserCreateCommand } from "@app/common/user/cmd/user.create.cmd";
+
 
 
 

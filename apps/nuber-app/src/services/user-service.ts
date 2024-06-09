@@ -1,8 +1,8 @@
-import { DriverCreateCmd } from "@app/user-events/driver/cmd/driver.create.cmd";
-import { UserCreateCommand } from "@app/user-events/user/cmd/user.create.cmd";
-import { GetUserEvent } from "@app/user-events/user/event/user.get";
-import { UserTypeDto } from "@app/user-events/user/event/user.type.dto";
-import { BadRequestException, Body, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, Post, UnauthorizedException } from "@nestjs/common";
+import { DriverCreateCmd } from "@app/common/driver/cmd/driver.create.cmd";
+import { UserCreateCommand } from "@app/common/user/cmd/user.create.cmd";
+import { GetUserEvent } from "@app/common/user/event/user.get";
+import { UserTypeDto } from "@app/common/user/event/user.type.dto";
+import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, Post, UnauthorizedException } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 
 

@@ -1,8 +1,20 @@
-export * from './user-events.module';
-export * from './user-events.service';
-
-
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+
+
+
+export function mapDto<T extends Record<string, any>, U extends Record<string, any>>(source: T): U {
+    const result = {} as U;
+  
+    for (const key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        result[key as keyof U] = source[key] as unknown as U[keyof U];
+      }
+    }
+  
+    return result;
+}
+
+
 
 export function IsEqualTo(property: string, validationOptions?: ValidationOptions) {
   return function (object: Record<string, any>, propertyName: string) {
@@ -22,4 +34,4 @@ export function IsEqualTo(property: string, validationOptions?: ValidationOption
     });
   };
 }
-
+  
