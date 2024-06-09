@@ -36,15 +36,22 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Install dependencies for ${matrix.app}
+    - name: Install dependencies for ${{ matrix.app }}
       working-directory: apps/${{ matrix.app }}
       run: npm install
 
-    - name: Build ${matrix.app}
+    - name: Build ${{ matrix.app }}
       working-directory: apps/${{ matrix.app }}
       run: npm run build
 
-    - name: Run tests for ${matrix.app}
+    - name: Start ${{ matrix.app }}
+      working-directory: apps/${{ matrix.app }}
+      run: nest start ${{ matrix.app }} &
+
+    - name: Wait for service to be ready
+      run: sleep 10
+
+    - name: Run tests for ${{ matrix.app }}
       working-directory: apps/${{ matrix.app }}
       run: npm run test
 
@@ -68,10 +75,10 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Install dependencies for ${matrix.app}
+    - name: Install dependencies for ${{ matrix.app }}
       working-directory: apps/${{ matrix.app }}
       run: npm install
 
-    - name: Lint ${matrix.app}
+    - name: Lint ${{ matrix.app }}
       working-directory: apps/${{ matrix.app }}
       run: npm run lint
