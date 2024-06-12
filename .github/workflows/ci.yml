@@ -1,4 +1,4 @@
-name: CI/CD NRA
+name: CI/CD NRA APP
 
 on:
   push:
