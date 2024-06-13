@@ -8,6 +8,8 @@ import { UserCreateCommand } from '@app/common/user/cmd/user.create.cmd';
 import { DriverCreateCmd } from '@app/common/driver/cmd/driver.create.cmd';
 import { GetUserEvent } from '@app/common/user/event/user.get';
 import { UserType } from './models/user.type';
+import { ExceptionPayloadFactory, createExceptionPayload } from '@app/common/exception/exception.payload.factory';
+import { BusinessException } from '@app/common/exception/business.exception';
 
 
 @Injectable()
@@ -104,7 +106,8 @@ export class UserServiceService {
       const user = await this.userModel.findById(userId).exec();
       if (!user) {
         this.logger.warn(`User not found with ID: ${userId}`);
-        return null;
+        const payload = createExceptionPayload(ExceptionPayloadFactory.USER_NAME_NOT_FOUND);
+        throw new BusinessException(payload);
       }
       return this.mapUserToGetUserEvent(user);
     } catch (error) {
