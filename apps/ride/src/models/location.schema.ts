@@ -1,18 +1,29 @@
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
+export type LocationDocument = Location & Document;
 
-@Entity()
+
+
+
+@Schema({
+    toJSON: {
+        getters: true,
+        virtuals: true,
+    },
+    timestamps: true,
+})
 export class Location {
-  @PrimaryGeneratedColumn('uuid')
-  id: number;
 
-  @Column({ type: 'float' })
-  latitude: number;
+    @Prop({ type: 'Number' }) 
+    latitude: number;
 
-  @Column({ type: 'float' })
-  longitude: number;
+    @Prop({ type: 'Number' }) 
+    longitude: number;
 
-  @Column({ type: 'integer' })
-  eta: number; 
+    @Prop({ type: 'Number' })
+    eta: number; 
 }
+
+export const LocationSchema = SchemaFactory.createForClass(Location);

@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Ride } from './models/ride.schema';
-import { Repository } from 'typeorm';
+import { RequestDriver } from '@app/common/ride/cmd/request.driver';
+
+
+
 
 @Injectable()
 export class RideService {
   constructor(
-    @InjectRepository(Ride) private readonly rideRepository: Repository<Ride>
+
   ){}
 
 
-  async requestDrive(): Promise<any> {
+
+  async requestDrive(request: RequestDriver): Promise<any> {
 
   }
 }
