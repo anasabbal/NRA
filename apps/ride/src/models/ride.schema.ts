@@ -1,28 +1,42 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Status } from "./status";
 
 
 
+export type RideDocument = Ride & Document;
 
-@Entity()
+
+@Schema({
+    toJSON: {
+        getters: true,
+        virtuals: true,
+    },
+    timestamps: true,
+})
 export class Ride {
 
-    @PrimaryGeneratedColumn('uuid')
-    ride_id: string;
 
-    @Column({ type: 'varchar' })
-    driver_id: string;
+    @Prop({ type: String })
+    driverId: string;
 
-    @ManyToOne(() => Location, { eager: true, cascade: true })
+    @Prop({
+        type: { type: 'ObjectId', ref: 'Location' }, // referring to Location model
+        autopopulate: { select: { '_id': 0 } }, 
+    })
     location_pickup: Location;
 
-    @ManyToOne(() => Location, { eager: true, cascade: true })
+    @Prop({
+        type: { type: 'ObjectId', ref: 'Location' },
+        autopopulate: { select: { '_id': 0 } },
+    })
     location_destination: Location;
 
-    @Column({
-        type: 'enum',
-        enum: Status,
+    @Prop({
+        type: 'String', 
+        enum: Object.values(Status), 
         default: Status.PROCESSING,
     })
-    status: Status;
+    status: string;
 }
+
+export const RideSchema = SchemaFactory.createForClass(Ride);

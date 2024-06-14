@@ -1,7 +1,5 @@
 import { ConnectOptions } from "mongoose";
 
-
-
 const uriDb = 'mongodb+srv://anas:anas@cluster0.uy7csfj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
 
