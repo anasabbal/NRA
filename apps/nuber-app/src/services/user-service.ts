@@ -2,19 +2,19 @@ import { DriverCreateCmd } from "@app/common/driver/cmd/driver.create.cmd";
 import { UserCreateCommand } from "@app/common/user/cmd/user.create.cmd";
 import { GetUserEvent } from "@app/common/user/event/user.get";
 import { UserTypeDto } from "@app/common/user/event/user.type.dto";
-import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, Post, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, LoggerService, Post, UnauthorizedException } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 
 
 @Injectable()
 export class UserService {
 
-    private readonly logger = new Logger(UserService.name);
-
     constructor(
         @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
         @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
     ) {}
 
     async findUserTypeById(userTypeId: string): Promise<UserTypeDto> {

@@ -37,15 +37,6 @@
         "tsConfigPath": "apps/notification/tsconfig.app.json"
       }
     },
-    "trip": {
-      "type": "application",
-      "root": "apps/trip",
-      "entryFile": "main",
-      "sourceRoot": "apps/trip/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/trip/tsconfig.app.json"
-      }
-    },
     "driver": {
       "type": "application",
       "root": "apps/driver",
@@ -62,6 +53,15 @@
       "sourceRoot": "libs/common/src",
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "ride": {
+      "type": "application",
+      "root": "apps/ride",
+      "entryFile": "main",
+      "sourceRoot": "apps/ride/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ride/tsconfig.app.json"
       }
     }
   }

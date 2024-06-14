@@ -13,4 +13,8 @@ export class DriversController {
   async getAllDrivers(): Promise<DriverDto[]> {
     return this.driverService.getDrivers();
   }
+  @Get('sorted')
+  async getDriverSortedByStatus(): Promise<DriverDto[]> {
+    return this.driverService.getDriverSortedByStatus();
+  }
 }

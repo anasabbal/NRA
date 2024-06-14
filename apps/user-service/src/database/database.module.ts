@@ -1,5 +1,5 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
-import mongoConfig from '../config/mongo.config';
+import mongoConfig from '../auth/config/mongo.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 

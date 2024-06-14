@@ -6,9 +6,15 @@ import { UserController } from './rest/user.controller';
 import { AuthController } from './rest/auth.controller';
 import { DriversController } from './rest/driver.controller';
 import { DriverService } from './services/driver-service';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
+    PrometheusModule.register({
+      path: '/metrics',
+    }),
     ConfigModule.forRoot(),
     ClientsModule.register([
       {
@@ -28,6 +34,16 @@ import { DriverService } from './services/driver-service';
         },
       },
     ]),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.simple(),
+          ),
+        })
+      ],
+    }),
   ],
   controllers: [AuthController, UserController, DriversController],
   providers: [UserService, DriverService]
