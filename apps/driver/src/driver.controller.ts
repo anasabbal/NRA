@@ -3,6 +3,7 @@ import { DriverService } from './driver.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { DriverCreateCmd } from '@app/common/driver/cmd/driver.create.cmd';
 import { DriverDto } from '@app/common/driver/event/driver.dto';
+import { mapDriversToDtos } from './utils/driver.mapper';
 
 @Controller('drivers')
 export class DriverController {
@@ -16,6 +17,13 @@ export class DriverController {
 
   @MessagePattern({ cmd: 'get_all_driver'})
   async findAllDriver(): Promise<DriverDto[]> {
-    return this.driverService.findAllDrivers();
+    const drivers = await this.driverService.findAllDrivers();
+    return mapDriversToDtos(drivers);
+  }
+
+  @MessagePattern({ cmd: 'get_all_sorted_by_status'})
+  async getAllDrivers(): Promise<DriverDto[]> {
+    const drivers = await this.driverService.findAllSortedByStatus();
+    return mapDriversToDtos(drivers);
   }
 }

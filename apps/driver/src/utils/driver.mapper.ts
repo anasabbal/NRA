@@ -14,3 +14,7 @@ export function mapDriverToDto(driver: Driver): DriverDto {
   
     return driverDto;
 }
+
+export function mapDriversToDtos(drivers: Driver[]): DriverDto[] {
+    return drivers.map(driver => mapDriverToDto(driver));
+}
