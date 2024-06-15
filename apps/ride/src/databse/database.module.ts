@@ -8,10 +8,8 @@ import mongoose from "mongoose";
 
 @Module({
     imports: [
-      MongooseModule.forRootAsync({
-        useFactory: () => ({
-          uri: db.uri,
-        }),
+      MongooseModule.forRoot(db.uri, {
+        dbName: 'rides'
       }),
     ],
   })
@@ -21,9 +19,9 @@ import mongoose from "mongoose";
     async onModuleInit() {
       try {
         await mongoose.connect(db.uri);
-        this.logger.log('Driver Database connection established');
+        this.logger.log('Ride Database connection established');
       } catch (error) {
-        this.logger.error(`Driver Database connection error: ${error}`);
+        this.logger.error(`Ride Database connection error: ${error}`);
       }
     }
   }

@@ -5,10 +5,8 @@ import db from '../config/db';
 
 @Module({
     imports: [
-      MongooseModule.forRootAsync({
-        useFactory: () => ({
-          uri: db.uri,
-        }),
+      MongooseModule.forRoot(db.uri, {
+        dbName: 'drivers'
       }),
     ],
   })

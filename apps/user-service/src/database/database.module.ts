@@ -5,10 +5,8 @@ import mongoose from 'mongoose';
 
 @Module({
     imports: [
-      MongooseModule.forRootAsync({
-        useFactory: () => ({
-          uri: mongoConfig.uri
-        }),
+      MongooseModule.forRoot(mongoConfig.uri, {
+        dbName: 'user'
       }),
     ],
   })
