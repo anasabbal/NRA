@@ -3,19 +3,22 @@ import { UserServiceController } from './user-service.controller';
 import { UserServiceService } from './user-service.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
-import { DatabaseModule } from './database/database.module';
 import forFeatureDb from './auth/config/for-feature.db';
+import { DatabaseModule } from '@app/database';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 
 @Module({
   imports: [
     MongooseModule.forFeature(forFeatureDb),
-    DatabaseModule,
+    DatabaseModule.forRoot(process.env.MONGODB_URI, 'user'),
     forwardRef(() => AuthModule),
   ],
   controllers: [UserServiceController],
-  providers: [UserServiceService], // Provided here
-  exports: [UserServiceService], // Also exported here
+  providers: [UserServiceService],
+  exports: [UserServiceService],
 })
 export class UserServiceModule implements OnModuleInit{
 

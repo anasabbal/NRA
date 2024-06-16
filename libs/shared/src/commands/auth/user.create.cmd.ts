@@ -1,4 +1,4 @@
-import { IsEqualTo } from '@app/common/utils';
+import { IsEqualTo } from '@app/shared/utils';
 import { IsString, IsEmail, MinLength, MaxLength, IsEnum, IsIn } from 'class-validator';
 
 

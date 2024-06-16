@@ -1,4 +1,4 @@
-import { DriverDto } from "@app/common/driver/event/driver.dto";
+import { DriverDto } from "@app/shared/events/driver/driver.dto";
 import { Driver } from "../models/driver.schema";
 
 

@@ -3,13 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './models/user.schema';
 import * as bcrypt from 'bcrypt';
-import { UserTypeDto } from '@app/common/user/event/user.type.dto';
-import { UserCreateCommand } from '@app/common/user/cmd/user.create.cmd';
-import { DriverCreateCmd } from '@app/common/driver/cmd/driver.create.cmd';
-import { GetUserEvent } from '@app/common/user/event/user.get';
+import { UserTypeDto } from '@app/shared/events/user/user.type.dto';
+import { GetUserEvent } from '@app/shared/events/user/user.get';
 import { UserType } from './models/user.type';
-import { ExceptionPayloadFactory, createExceptionPayload } from '@app/common/exception/exception.payload.factory';
-import { BusinessException } from '@app/common/exception/business.exception';
+import { ExceptionPayloadFactory, createExceptionPayload } from '@app/shared/exception/exception.payload.factory';
+import { BusinessException } from '@app/shared/exception/business.exception';
+import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
+import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 
 
 @Injectable()

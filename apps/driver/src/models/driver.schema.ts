@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { DriverStatus, DriverStatusType } from "../enums/driver.status";
-import { Vehicle } from "./vehicle.schema";
 import { Types } from "mongoose";
 
 
