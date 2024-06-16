@@ -1,9 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
 import { DriverService } from './driver.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { DriverCreateCmd } from '@app/common/driver/cmd/driver.create.cmd';
-import { DriverDto } from '@app/common/driver/event/driver.dto';
+import { DriverDto } from '@app/shared/events/driver/driver.dto';
 import { mapDriversToDtos } from './utils/driver.mapper';
+import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
 
 @Controller('drivers')
 export class DriverController {

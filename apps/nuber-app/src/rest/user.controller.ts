@@ -1,8 +1,8 @@
 import { ApiOperation } from "@nestjs/swagger";
 import { UserService } from "../services/user-service";
 import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
-import { GetUserEvent } from "@app/common/user/event/user.get";
-import { UserTypeDto } from "@app/common/user/event/user.type.dto";
+import { GetUserEvent } from "@app/shared/events/user/user.get";
+import { UserTypeDto } from "@app/shared/events/user/user.type.dto";
 
 
 

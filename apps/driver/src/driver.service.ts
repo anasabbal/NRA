@@ -4,9 +4,7 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { Driver } from './models/driver.schema';
 import { DriverStatus } from './enums/driver.status';
-import { mapDriverToDto, mapDriversToDtos } from './utils/driver.mapper';
-import { DriverCreateCmd } from '@app/common/driver/cmd/driver.create.cmd';
-import { DriverDto } from '@app/common/driver/event/driver.dto';
+import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
 
 @Injectable()
 export class DriverService {
