@@ -1,11 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { GatewayModule } from './gateway.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-
-
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(GatewayModule);
 
   // Swagger configuration
   const config = new DocumentBuilder()

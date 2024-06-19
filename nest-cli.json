@@ -10,15 +10,6 @@
   "monorepo": true,
   "root": "apps/nuber-app",
   "projects": {
-    "nuber-app": {
-      "type": "application",
-      "root": "apps/nuber-app",
-      "entryFile": "main",
-      "sourceRoot": "apps/nuber-app/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/nuber-app/tsconfig.app.json"
-      }
-    },
     "user-service": {
       "type": "application",
       "root": "apps/user-service",
@@ -80,6 +71,15 @@
       "sourceRoot": "libs/database/src",
       "compilerOptions": {
         "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
       }
     }
   }
