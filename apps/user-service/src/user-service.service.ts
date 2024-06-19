@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './models/user.schema';
@@ -10,6 +10,8 @@ import { ExceptionPayloadFactory, createExceptionPayload } from '@app/shared/exc
 import { BusinessException } from '@app/shared/exception/business.exception';
 import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
+import { EmailConfirmation } from './models/email.confirmation';
+import { EmailService } from './email.service';
 
 
 @Injectable()
@@ -19,7 +21,8 @@ export class UserServiceService {
 
   constructor(
     @InjectModel('User') private readonly userModel: Model<User>,
-    @InjectModel('UserType') private readonly userTypeModel: Model<UserType>
+    @InjectModel('UserType') private readonly userTypeModel: Model<UserType>,
+    private readonly emailService: EmailService
   ) {}
 
   async seedUserTypes() {
@@ -62,8 +65,13 @@ export class UserServiceService {
     const userType = await this.findUserTypeById(userTypeId);
     const hashedPassword = await this.hashPassword(command.password);
     const newUser = this.createUser(command, hashedPassword, userType);
-    return await this.saveUser(newUser);
+    
+    return newUser;
   }
+  async verifyUser(): Promise<any> {
+
+  }
+
   private async hashPassword(password: string): Promise<string> {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
