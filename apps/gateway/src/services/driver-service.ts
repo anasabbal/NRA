@@ -1,3 +1,4 @@
+import { DriverCreateCmd } from "@app/shared/commands/driver/driver.create.cmd";
 import { DriverDto } from "@app/shared/events/driver/driver.dto";
 import { Inject, Injectable, Logger, LoggerService } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
@@ -16,6 +17,9 @@ export class DriverService {
     ){}
 
 
+    async createDriver(cmd: DriverCreateCmd): Promise<string> {
+        return await this.driverClient.send({ cmd: 'create' }, cmd).toPromise();
+    }
     async getDrivers(): Promise<DriverDto[]> {
         try {
             const response = await this.driverClient.send<DriverDto[]>({ cmd: 'get_all_driver' }, {}).toPromise();

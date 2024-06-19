@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        app: [driver, notification, gateway, ride, user-service]
+        app: [driver, notification, gateway, ride, user-service, auth]
 
     steps:
     - name: Checkout code

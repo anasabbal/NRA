@@ -9,6 +9,7 @@ import { UserController } from './rest/user.controller';
 import { DriversController } from './rest/driver.controller';
 import { UserService } from './services/user-service';
 import { DriverService } from './services/driver-service';
+import { AuthService } from './services/auth.service';
 
 @Module({
   imports: [
@@ -46,6 +47,6 @@ import { DriverService } from './services/driver-service';
     }),
   ],
   controllers: [AuthController, UserController, DriversController],
-  providers: [UserService, DriverService]
+  providers: [UserService, DriverService, AuthService]
 })
 export class GatewayModule {}

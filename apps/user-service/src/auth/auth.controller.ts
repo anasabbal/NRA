@@ -1,9 +1,9 @@
 import { Controller, Logger, Request, UseGuards } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service'; 
-import { JwtAuthGuard } from './jwt.guard';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 import { UserLoginCmd } from '@app/shared/commands/auth/user.login.cmd';
+import { JwtAuthGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
