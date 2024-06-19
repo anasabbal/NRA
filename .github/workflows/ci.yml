@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        app: [driver, notification, nuber-app, ride, user-service]
+        app: [driver, notification, gateway, ride, user-service]
 
     steps:
     - name: Checkout code
