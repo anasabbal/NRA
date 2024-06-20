@@ -29,6 +29,11 @@ export class User {
 
   @Prop({ type: UserTypeSchema })
   userType: UserType;
+  
+  @Prop({ type: Object, default: {} }) 
+  auth: {
+    email: { valid: boolean }
+  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

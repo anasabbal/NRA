@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 import { UserLoginCmd } from '@app/shared/commands/auth/user.login.cmd';
 import { JwtAuthGuard } from './jwt.guard';
+import { ResponseSuccess } from '@app/shared/dto/response.dto';
+import { IResponse } from '@app/shared/interfaces/response.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +26,6 @@ export class AuthController {
         return "User created successfully";
     }
 
-
     @MessagePattern({ cmd: 'login' })
     async login(@Payload() req: UserLoginCmd): Promise<any> {
         this.logger.log(`Logging in user: ${req.email}`);
@@ -36,5 +37,10 @@ export class AuthController {
     async getProfile(@Request() req) :Promise<any>{
         this.logger.log(`Request is: ${req}`);
         return req.user;
+    }
+    @MessagePattern('verify-user') 
+    async verifyUser(token: string): Promise<IResponse> {
+        await this.authService.verifyEmail(token);
+        return new ResponseSuccess("EMAIL_CONFIRMATION.VERIFIED_SUCCESSFULLY");
     }
 }

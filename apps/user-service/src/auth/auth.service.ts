@@ -1,10 +1,10 @@
 import { BadRequestException, Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { UserServiceService } from '../user-service.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../models/user.schema';
-import * as bcrypt from 'bcrypt';
 import { validate } from 'class-validator';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
+import { IResponse } from '@app/shared/interfaces/response.interface';
+
 
 @Injectable()
 export class AuthService {
@@ -18,14 +18,14 @@ export class AuthService {
         private jwtService: JwtService
     ){}
 
-    async register(userTypeId: string, command: UserCreateCommand): Promise<User> {
+    async register(userTypeId: string, command: UserCreateCommand): Promise<IResponse> {
         const errors = await validate(command);
         if (errors.length > 0) {
           throw new BadRequestException(errors);
         }
         try {
-          const newUser = await this.usersService.create(userTypeId, command); // await here
-          return newUser;
+          const result = await this.usersService.create(userTypeId, command);
+          return result;
         } catch (error) {
           this.logger.error(`Failed to register user: ${command.email}`, error.stack);
           throw error;
@@ -40,6 +40,9 @@ export class AuthService {
           access_token: token,
           email: user.email
         };
+    }
+    async verifyEmail(token: string): Promise<boolean> {
+      return this.usersService.verifyUser(token);
     }
 }
 
