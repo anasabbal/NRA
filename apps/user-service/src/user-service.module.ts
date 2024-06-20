@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import forFeatureDb from './auth/config/for-feature.db';
 import { DatabaseModule } from '@app/database';
 import * as dotenv from 'dotenv';
+import { EmailService } from './email.service';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ dotenv.config();
     forwardRef(() => AuthModule),
   ],
   controllers: [UserServiceController],
-  providers: [UserServiceService],
+  providers: [UserServiceService, EmailService],
   exports: [UserServiceService],
 })
 export class UserServiceModule implements OnModuleInit{
