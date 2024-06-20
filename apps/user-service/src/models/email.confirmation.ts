@@ -13,8 +13,9 @@ export type EmailConfirmationDocument = EmailConfirmation & Document;
     timestamps: true,
   })
 export class EmailConfirmation {
-    email: String;
-    emailToken: String;
+    email: string;
+    emailToken: string;
+    
     timestamp: Date
 }
 

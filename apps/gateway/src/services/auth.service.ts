@@ -22,7 +22,7 @@ export class AuthService {
           const userType = await this.userService.findUserTypeById(userTypeId);
           console.log(`User type with id ${userType.id} found`);
           if(userType.id == userTypeId){
-            return await this.driverService.createDriver(command);
+            return await this.userService.createUser(command, userTypeId);
           }else {
             return await this.userService.createUser(command, userTypeId);
           }
@@ -56,5 +56,13 @@ export class AuthService {
                 throw new InternalServerErrorException('Failed to login');
             }
         }
+    }
+    async verifyUser(token: string): Promise<any> {
+      try {
+        const result = await this.userClient.send({ cmd: 'verify-user'}, token).toPromise();
+        return result;
+      }catch(error){
+        throw new InternalServerErrorException('Failed to Verify');
+      }
     }
 }

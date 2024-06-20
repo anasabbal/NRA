@@ -18,8 +18,8 @@ dotenv.config();
     forwardRef(() => AuthModule),
   ],
   controllers: [UserServiceController],
-  providers: [UserServiceService],
-  exports: [UserServiceService, EmailService],
+  providers: [UserServiceService, EmailService],
+  exports: [UserServiceService],
 })
 export class UserServiceModule implements OnModuleInit{
 

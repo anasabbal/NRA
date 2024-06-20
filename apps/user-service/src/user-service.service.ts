@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './models/user.schema';
@@ -12,6 +12,8 @@ import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 import { EmailConfirmation } from './models/email.confirmation';
 import { EmailService } from './email.service';
+import { ResponseError, ResponseSuccess } from '@app/shared/dto/response.dto';
+import { IResponse } from '@app/shared/interfaces/response.interface';
 
 
 @Injectable()
@@ -22,6 +24,7 @@ export class UserServiceService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<User>,
     @InjectModel('UserType') private readonly userTypeModel: Model<UserType>,
+    @InjectModel('EmailConfirmation') private readonly emailConfirmationModel: Model<EmailConfirmation>,
     private readonly emailService: EmailService
   ) {}
 
@@ -61,15 +64,48 @@ export class UserServiceService {
     }
   }
 
-  async create(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<User> {
-    const userType = await this.findUserTypeById(userTypeId);
-    const hashedPassword = await this.hashPassword(command.password);
-    const newUser = this.createUser(command, hashedPassword, userType);
-    
-    return newUser;
-  }
-  async verifyUser(): Promise<any> {
+  async create(userTypeId: string, command: UserCreateCommand): Promise<IResponse> {
+    try {
+        const userType = await this.findUserTypeById(userTypeId);
+        const hashedPassword = await this.hashPassword(command.password);
+        const newUser = this.createUser(command, hashedPassword, userType);
 
+        // create email token
+        await this.emailService.createEmailToken(newUser.email);
+
+        // send email verification
+        const sent = await this.emailService.sendEmailVerification(newUser.email);
+
+        if (sent) {
+            return new ResponseSuccess("REGISTRATION.USER_REGISTERED_SUCCESSFULLY");
+        } else {
+            return new ResponseError("REGISTRATION.ERROR.MAIL_NOT_SENT");
+        }
+    } catch (error) {
+        // handle any errors appropriately
+        console.error("Error creating user:", error);
+        return new ResponseError("REGISTRATION.ERROR.GENERIC_ERROR"); 
+    }
+  }
+  async verifyUser(token: string): Promise<boolean> {
+    const emailVerif = await this.emailConfirmationModel.findOne({ emailToken: token });
+
+    if (emailVerif && emailVerif.email) {
+        const user = await this.userModel.findOne({ email: emailVerif.email });
+
+        if (user) {
+            user.auth.email.valid = true;
+            const savedUser = await user.save();
+            if (emailVerif) {
+              this.emailConfirmationModel.deleteOne({ _id: emailVerif._id })
+            }
+            return !!savedUser;
+        } else {
+            throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+        }
+      } else {
+        throw new HttpException('LOGIN.EMAIL_CODE_NOT_VALID', HttpStatus.FORBIDDEN);
+      }
   }
 
   private async hashPassword(password: string): Promise<string> {
