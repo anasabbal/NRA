@@ -38,7 +38,7 @@ export class AuthController {
         this.logger.log(`Request is: ${req}`);
         return req.user;
     }
-    @MessagePattern('verify-user') 
+    @MessagePattern({ cmd: 'verify-user'}) 
     async verifyUser(token: string): Promise<IResponse> {
         await this.authService.verifyEmail(token);
         return new ResponseSuccess("EMAIL_CONFIRMATION.VERIFIED_SUCCESSFULLY");
