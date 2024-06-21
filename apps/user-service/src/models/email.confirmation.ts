@@ -1,22 +1,18 @@
-import { Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
+export type VerificationTokenDocument = VerificationToken & Document;
 
+@Schema({ timestamps: true })
+export class VerificationToken {
+  @Prop({ required: true, unique: true })
+  token: string;
 
-export type EmailConfirmationDocument = EmailConfirmation & Document;
+  @Prop({ required: true })
+  email: string;
 
-
-@Schema({
-    toJSON: {
-      getters: true,
-      virtuals: true,
-    },
-    timestamps: true,
-  })
-export class EmailConfirmation {
-    email: string;
-    emailToken: string;
-    
-    timestamp: Date
+  @Prop({ required: true, default: Date.now })
+  timestamp: Date;
 }
 
-export const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
+export const VerificationTokenSchema = SchemaFactory.createForClass(VerificationToken);

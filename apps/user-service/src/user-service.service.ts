@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './models/user.schema';
@@ -10,11 +10,10 @@ import { ExceptionPayloadFactory, createExceptionPayload } from '@app/shared/exc
 import { BusinessException } from '@app/shared/exception/business.exception';
 import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
-import { EmailConfirmation } from './models/email.confirmation';
 import { EmailService } from './email.service';
 import { ResponseError, ResponseSuccess } from '@app/shared/dto/response.dto';
 import { IResponse } from '@app/shared/interfaces/response.interface';
-
+import { VerificationToken, VerificationTokenDocument } from './models/email.confirmation';
 
 @Injectable()
 export class UserServiceService {
@@ -22,9 +21,9 @@ export class UserServiceService {
   private readonly logger = new Logger(UserServiceService.name);
 
   constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
-    @InjectModel('UserType') private readonly userTypeModel: Model<UserType>,
-    @InjectModel('EmailConfirmation') private readonly emailConfirmationModel: Model<EmailConfirmation>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(UserType.name) private readonly userTypeModel: Model<UserType>,
+    @InjectModel(VerificationToken.name) private readonly verificationTokenModel: Model<VerificationTokenDocument>,
     private readonly emailService: EmailService
   ) {}
 
@@ -44,69 +43,93 @@ export class UserServiceService {
         }
       }
     } catch (error) {
-      // handle the error appropriately (e.g., log it, throw it, etc.)
       console.error('Error seeding user types:', error);
     }
   }
+
   async findUserTypeById(userTypeId: string): Promise<UserTypeDto | null> {
     try {
       const userType = await this.userTypeModel.findById(userTypeId).exec();
-      const result = {
-        id : userType.id,
+      if (!userType) return null;
+
+      return {
+        id: userType.id,
         name: userType.type
       };
-
-      return result;
     } catch (error) {
-      // handle errors (e.g., log error, throw custom exception)
       console.error('Error finding user type by ID:', error);
-      return null; // Return null if an error occurs
+      return null;
     }
   }
 
-  async create(userTypeId: string, command: UserCreateCommand): Promise<IResponse> {
+  async create(userTypeId: string, command: UserCreateCommand): Promise<any> {
     try {
-        const userType = await this.findUserTypeById(userTypeId);
-        const hashedPassword = await this.hashPassword(command.password);
-        const newUser = this.createUser(command, hashedPassword, userType);
+      // Find user type by ID
+      const userType = await this.findUserTypeById(userTypeId);
+      if (!userType) {
+        throw new Error('User type not found');
+      }
 
-        // create email token
-        await this.emailService.createEmailToken(newUser.email);
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(command.password, 10);
 
-        // send email verification
-        const sent = await this.emailService.sendEmailVerification(newUser.email);
+      // Create a new user instance
+      const newUser = new this.userModel({
+        firstName: command.firstName,
+        lastName: command.lastName,
+        email: command.email,
+        password: hashedPassword,
+        userType: { type: userType.name }, // Assuming userType has a 'name' property
+        verified: false, // Optional: set default value for verified
+      });
 
-        if (sent) {
-            return new ResponseSuccess("REGISTRATION.USER_REGISTERED_SUCCESSFULLY");
-        } else {
-            return new ResponseError("REGISTRATION.ERROR.MAIL_NOT_SENT");
-        }
+      // Save the user to the database
+      await newUser.save();
+
+      // Create email token
+      await this.emailService.createEmailToken(newUser.email);
+
+      // Send email verification
+      const sent = await this.emailService.sendEmailVerification(newUser.email);
+
+      if (sent) {
+        return new ResponseSuccess('User registered successfully');
+      } else {
+        return new ResponseError('Failed to send verification email');
+      }
     } catch (error) {
-        // handle any errors appropriately
-        console.error("Error creating user:", error);
-        return new ResponseError("REGISTRATION.ERROR.GENERIC_ERROR"); 
+      this.logger.error(`Error creating user: ${error.message}`);
+      throw new Error('Failed to create user');
     }
   }
+
   async verifyUser(token: string): Promise<boolean> {
-    const emailVerif = await this.emailConfirmationModel.findOne({ emailToken: token });
+    const emailConfirmation = await this.emailService.findEmailConfirmationWithToken(token);
 
-    if (emailVerif && emailVerif.email) {
-        const user = await this.userModel.findOne({ email: emailVerif.email });
-
-        if (user) {
-            user.auth.email.valid = true;
-            const savedUser = await user.save();
-            if (emailVerif) {
-              this.emailConfirmationModel.deleteOne({ _id: emailVerif._id })
-            }
-            return !!savedUser;
-        } else {
-            throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-        }
-      } else {
+    if (!emailConfirmation || !emailConfirmation.email) {
+        this.logger.error(`No valid email confirmation found for token ${token}`);
         throw new HttpException('LOGIN.EMAIL_CODE_NOT_VALID', HttpStatus.FORBIDDEN);
-      }
+    }
+
+    this.logger.log(`Email in emailConfirmation: ${emailConfirmation.email}`);
+    const user = await this.findUserByEmail(emailConfirmation.email);
+    this.logger.log(`User with email ${emailConfirmation.email}: ${user}`);
+
+    if (!user) {
+        this.logger.error(`User not found for email ${emailConfirmation.email}`);
+        throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    user.verified = true; // Assuming there is a verified field in your user schema
+    const savedUser = await user.save();
+
+    if (savedUser) {
+        this.logger.log(`Email confirmation object: ${JSON.stringify(emailConfirmation)}`);
+       // await this.verificationTokenModel.deleteOne({ _id: emailConfirmation._id });
+    }
+    return !!savedUser;
   }
+
 
   private async hashPassword(password: string): Promise<string> {
     try {
@@ -132,18 +155,7 @@ export class UserServiceService {
       throw error;
     }
   }
-  
-  private async saveUser(user: User): Promise<User> {
-    try {
-      const savedUser = await user.save();
-      console.log('User saved successfully');
-      return savedUser;
-    } catch (error) {
-      console.error('Error saving user:', error);
-      throw error;
-    }
-  }
-  
+
   async getById(userId: string): Promise<GetUserEvent> {
     try {
       this.logger.log(`Fetching user by ID: ${userId}`);
@@ -159,15 +171,25 @@ export class UserServiceService {
       throw error;
     }
   }
+
   async getAll(): Promise<User[]> {
-    const users = await this.userModel.find();
-    return users;
+    return this.userModel.find().exec();
   }
-  async mapUserToGetUserEvent(user: User): Promise<GetUserEvent> {
+
+  private async mapUserToGetUserEvent(user: User): Promise<GetUserEvent> {
     const getUserEvent = new GetUserEvent();
     getUserEvent.firstName = user.firstName;
     getUserEvent.lastName = user.lastName;
     getUserEvent.email = user.email;
     return getUserEvent;
+  }
+
+  async findUserByEmail(email: string): Promise<User | null> {
+    try {
+      return this.userModel.findOne({ email }).exec();
+    } catch (error) {
+      console.error(`Error finding user by email ${email}:`, error);
+      throw error;
+    }
   }
 }

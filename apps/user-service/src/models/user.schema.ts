@@ -30,10 +30,8 @@ export class User {
   @Prop({ type: UserTypeSchema })
   userType: UserType;
   
-  @Prop({ type: Object, default: {} }) 
-  auth: {
-    email: { valid: boolean }
-  };
+  @Prop({ default: false })
+  verified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
