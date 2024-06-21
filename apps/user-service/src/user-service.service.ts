@@ -1,16 +1,14 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { User } from './models/user.schema';
 import * as bcrypt from 'bcrypt';
 import { UserTypeDto } from '@app/shared/events/user/user.type.dto';
 import { GetUserEvent } from '@app/shared/events/user/user.get';
-import { UserType } from './models/user.type';
-import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
-import { EmailService } from './email.service';
 import { ResponseSuccess } from '@app/shared/dto/response.dto';
 import { IResponse } from '@app/shared/interfaces/response.interface';
 import { UserRepository } from './repository/user.repository';
+import { EmailService } from './email/email.service';
+import { UserTypeRepository } from './repository/user-type.repository';
+import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 
 
 
@@ -21,19 +19,14 @@ export class UserServiceService {
 
   constructor(
     private readonly userRepository: UserRepository,
-    @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(UserType.name) private readonly userTypeModel: Model<UserType>,
+    private readonly userTypeRepository: UserTypeRepository,
     private readonly emailService: EmailService
   ) {}
 
-  async seedUserTypes() {
+  async seedUserTypes(): Promise<void> {
     try {
       const userTypes = ['Driver', 'User'];
-  
-      if (!this.userTypeModel) {
-        throw new Error('userTypeModel is not initialized');
-      }
-  
+
       for (const type of userTypes) {
         await this.seedUserType(type);
       }
@@ -42,25 +35,29 @@ export class UserServiceService {
     }
   }
 
+
   private async seedUserType(type: string): Promise<void> {
-    const existingType = await this.userTypeModel.findOne({ type }).exec();
-    if (!existingType) {
-      const userType = new this.userTypeModel({ type });
-      await userType.save();
-      this.logger.log(`User type '${type}' seeded successfully.`);
-    } else {
-      this.logger.debug(`User type '${type}' already exists.`);
+    try {
+      const existingType = await this.userTypeRepository.findByType(type);
+      if (!existingType) {
+        const userType = await this.userTypeRepository.createUserType({ type });
+        this.logger.log(`User type '${type}' seeded successfully.`);
+      } else {
+        this.logger.debug(`User type '${type}' already exists.`);
+      }
+    } catch (error) {
+      this.logger.error(`Error seeding user type '${type}': ${error.message}`);
     }
   }
 
   async findUserTypeById(userTypeId: string): Promise<UserTypeDto | null> {
     try {
-      const userType = await this.userTypeModel.findById(userTypeId).exec();
+      const userType = await this.userTypeRepository.findById(userTypeId);
       if (!userType) return null;
 
       return {
         id: userType.id,
-        name: userType.type
+        name: userType.type,
       };
     } catch (error) {
       this.logger.error(`Error finding user type by ID: ${error.message}`);
@@ -83,26 +80,27 @@ export class UserServiceService {
     }
   }
 
-  private async createUserInstanceAndSave(userType: UserTypeDto, command: UserCreateCommand, hashedPassword: string): Promise<User> {
+  async createUserInstanceAndSave(userType: UserTypeDto | null, command: UserCreateCommand, hashedPassword: string): Promise<User> {
     try {
-      const newUser = new this.userModel({
+      if (!userType) {
+        throw new Error('User type not found');
+      }
+
+      const newUser = {
         firstName: command.firstName,
         lastName: command.lastName,
         email: command.email,
         password: hashedPassword,
-        userType: { type: userType.name },
+        userType: { type: userType.name }, // Assuming userType.name is correct for your schema
         verified: false,
-      });
+      };
 
-      const savedUser = await newUser.save();
-      this.logger.log(`User '${savedUser.email}' created successfully.`);
-      return savedUser;
+      return await this.userRepository.save(newUser);
     } catch (error) {
       this.logger.error(`Error creating and saving user: ${error.message}`);
       throw error;
     }
   }
-
   private async sendVerificationEmail(email: string): Promise<void> {
     try {
       await this.emailService.createEmailToken(email);
@@ -137,7 +135,7 @@ export class UserServiceService {
       }
 
       user.verified = true;
-      await user.save();
+      await this.userRepository.save(user);
 
       this.logger.log(`User '${emailConfirmation.email}' verified successfully.`);
       return true;
@@ -190,7 +188,7 @@ export class UserServiceService {
 
   async findUserByEmail(email: string): Promise<User | null> {
     try {
-      return await this.userModel.findOne({ email }).exec();
+      return await this.userRepository.findByEmail(email);
     } catch (error) {
       this.logger.error(`Error finding user by email ${email}: ${error.message}`);
       throw error;
