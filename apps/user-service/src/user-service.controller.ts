@@ -5,6 +5,7 @@ import { User } from './models/user.schema';
 import { GetUserEvent } from '@app/shared/events/user/user.get';
 import { UserTypeDto } from '@app/shared/events/user/user.type.dto';
 
+
 @Controller('users')
 export class UserServiceController {
   constructor(private readonly userService: UserServiceService) {}

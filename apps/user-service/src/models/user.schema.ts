@@ -12,9 +12,7 @@ export type UserDocument = User & Document;
   timestamps: true,
 })
 export class User {
-  save(): User | PromiseLike<User> {
-    throw new Error('Method not implemented.');
-  }
+
   @Prop({ required: true })
   firstName: string;
 

@@ -6,8 +6,11 @@ import { AuthModule } from './auth/auth.module';
 import forFeatureDb from './auth/config/for-feature.db';
 import { DatabaseModule } from '@app/database';
 import * as dotenv from 'dotenv';
-import { EmailService } from './email.service';
+import { EmailService } from './email/email.service';
 import { UserRepository } from './repository/user.repository';
+import { EmailVerificationRepository } from './repository/email.repository';
+import { UserTypeRepository } from './repository/user-type.repository';
+import { EmailUtils } from './email/utils';
 
 dotenv.config();
 
@@ -19,7 +22,7 @@ dotenv.config();
     forwardRef(() => AuthModule),
   ],
   controllers: [UserServiceController],
-  providers: [UserServiceService, EmailService, UserRepository],
+  providers: [UserServiceService, EmailService, UserRepository, EmailVerificationRepository, UserTypeRepository, EmailUtils],
   exports: [UserServiceService],
 })
 export class UserServiceModule implements OnModuleInit{
