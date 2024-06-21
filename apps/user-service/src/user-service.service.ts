@@ -6,14 +6,13 @@ import * as bcrypt from 'bcrypt';
 import { UserTypeDto } from '@app/shared/events/user/user.type.dto';
 import { GetUserEvent } from '@app/shared/events/user/user.get';
 import { UserType } from './models/user.type';
-import { ExceptionPayloadFactory, createExceptionPayload } from '@app/shared/exception/exception.payload.factory';
-import { BusinessException } from '@app/shared/exception/business.exception';
-import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 import { EmailService } from './email.service';
-import { ResponseError, ResponseSuccess } from '@app/shared/dto/response.dto';
+import { ResponseSuccess } from '@app/shared/dto/response.dto';
 import { IResponse } from '@app/shared/interfaces/response.interface';
-import { VerificationToken, VerificationTokenDocument } from './models/email.confirmation';
+import { UserRepository } from './repository/user.repository';
+
+
 
 @Injectable()
 export class UserServiceService {
@@ -21,9 +20,9 @@ export class UserServiceService {
   private readonly logger = new Logger(UserServiceService.name);
 
   constructor(
+    private readonly userRepository: UserRepository,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(UserType.name) private readonly userTypeModel: Model<UserType>,
-    @InjectModel(VerificationToken.name) private readonly verificationTokenModel: Model<VerificationTokenDocument>,
     private readonly emailService: EmailService
   ) {}
 
@@ -36,14 +35,21 @@ export class UserServiceService {
       }
   
       for (const type of userTypes) {
-        const existingType = await this.userTypeModel.findOne({ type }).exec();
-        if (!existingType) {
-          const userType = new this.userTypeModel({ type });
-          await userType.save();
-        }
+        await this.seedUserType(type);
       }
     } catch (error) {
-      console.error('Error seeding user types:', error);
+      this.logger.error('Error seeding user types:', error);
+    }
+  }
+
+  private async seedUserType(type: string): Promise<void> {
+    const existingType = await this.userTypeModel.findOne({ type }).exec();
+    if (!existingType) {
+      const userType = new this.userTypeModel({ type });
+      await userType.save();
+      this.logger.log(`User type '${type}' seeded successfully.`);
+    } else {
+      this.logger.debug(`User type '${type}' already exists.`);
     }
   }
 
@@ -57,113 +63,106 @@ export class UserServiceService {
         name: userType.type
       };
     } catch (error) {
-      console.error('Error finding user type by ID:', error);
+      this.logger.error(`Error finding user type by ID: ${error.message}`);
       return null;
     }
   }
 
-  async create(userTypeId: string, command: UserCreateCommand): Promise<any> {
+  async create(userTypeId: string, command: UserCreateCommand): Promise<IResponse> {
     try {
-      // Find user type by ID
       const userType = await this.findUserTypeById(userTypeId);
-      if (!userType) {
-        throw new Error('User type not found');
-      }
+      const hashedPassword = await this.hashPassword(command.password);
+      const newUser = await this.createUserInstanceAndSave(userType, command, hashedPassword);
 
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(command.password, 10);
+      await this.sendVerificationEmail(newUser.email);
 
-      // Create a new user instance
+      return new ResponseSuccess('User registered successfully');
+    } catch (error) {
+      this.logger.error(`Error creating user: ${error.message}`);
+      throw new HttpException('Failed to create user', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private async createUserInstanceAndSave(userType: UserTypeDto, command: UserCreateCommand, hashedPassword: string): Promise<User> {
+    try {
       const newUser = new this.userModel({
         firstName: command.firstName,
         lastName: command.lastName,
         email: command.email,
         password: hashedPassword,
-        userType: { type: userType.name }, // Assuming userType has a 'name' property
-        verified: false, // Optional: set default value for verified
+        userType: { type: userType.name },
+        verified: false,
       });
 
-      // Save the user to the database
-      await newUser.save();
-
-      // Create email token
-      await this.emailService.createEmailToken(newUser.email);
-
-      // Send email verification
-      const sent = await this.emailService.sendEmailVerification(newUser.email);
-
-      if (sent) {
-        return new ResponseSuccess('User registered successfully');
-      } else {
-        return new ResponseError('Failed to send verification email');
-      }
+      const savedUser = await newUser.save();
+      this.logger.log(`User '${savedUser.email}' created successfully.`);
+      return savedUser;
     } catch (error) {
-      this.logger.error(`Error creating user: ${error.message}`);
-      throw new Error('Failed to create user');
+      this.logger.error(`Error creating and saving user: ${error.message}`);
+      throw error;
+    }
+  }
+
+  private async sendVerificationEmail(email: string): Promise<void> {
+    try {
+      await this.emailService.createEmailToken(email);
+      const sent = await this.emailService.sendEmailVerification(email);
+
+      if (!sent) {
+        this.logger.warn(`Failed to send verification email to ${email}`);
+        throw new Error('Failed to send verification email');
+      }
+
+      this.logger.log(`Verification email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`Error sending verification email: ${error.message}`);
+      throw error;
     }
   }
 
   async verifyUser(token: string): Promise<boolean> {
-    const emailConfirmation = await this.emailService.findEmailConfirmationWithToken(token);
-
-    if (!emailConfirmation || !emailConfirmation.email) {
-        this.logger.error(`No valid email confirmation found for token ${token}`);
-        throw new HttpException('LOGIN.EMAIL_CODE_NOT_VALID', HttpStatus.FORBIDDEN);
-    }
-
-    this.logger.log(`Email in emailConfirmation: ${emailConfirmation.email}`);
-    const user = await this.findUserByEmail(emailConfirmation.email);
-    this.logger.log(`User with email ${emailConfirmation.email}: ${user}`);
-
-    if (!user) {
-        this.logger.error(`User not found for email ${emailConfirmation.email}`);
-        throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
-
-    user.verified = true; // Assuming there is a verified field in your user schema
-    const savedUser = await user.save();
-
-    if (savedUser) {
-        this.logger.log(`Email confirmation object: ${JSON.stringify(emailConfirmation)}`);
-       // await this.verificationTokenModel.deleteOne({ _id: emailConfirmation._id });
-    }
-    return !!savedUser;
-  }
-
-
-  private async hashPassword(password: string): Promise<string> {
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      console.log('Password hashed successfully');
-      return hashedPassword;
+      const emailConfirmation = await this.emailService.findEmailConfirmationWithToken(token);
+
+      if (!emailConfirmation || !emailConfirmation.email) {
+        this.logger.error(`No valid email confirmation found for token ${token}`);
+        throw new HttpException('Invalid email confirmation token', HttpStatus.FORBIDDEN);
+      }
+
+      const user = await this.findUserByEmail(emailConfirmation.email);
+
+      if (!user) {
+        this.logger.error(`User not found for email ${emailConfirmation.email}`);
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      user.verified = true;
+      await user.save();
+
+      this.logger.log(`User '${emailConfirmation.email}' verified successfully.`);
+      return true;
     } catch (error) {
-      console.error('Error hashing password:', error);
+      this.logger.error(`Error verifying user: ${error.message}`);
       throw error;
     }
   }
-  
-  private createUser(command: UserCreateCommand | DriverCreateCmd, hashedPassword: string, userType: UserTypeDto | null): User {
+
+  private async hashPassword(password: string): Promise<string> {
     try {
-      if (!userType || !userType.name) {
-        throw new Error('User type not found');
-      }
-      const { email, firstName, lastName } = command;
-      console.log('Creating user instance');
-      return new this.userModel({ email, password: hashedPassword, firstName, lastName, userType });
+      return await bcrypt.hash(password, 10);
     } catch (error) {
-      console.error('Error creating user:', error);
+      this.logger.error(`Error hashing password: ${error.message}`);
       throw error;
     }
   }
 
   async getById(userId: string): Promise<GetUserEvent> {
     try {
-      this.logger.log(`Fetching user by ID: ${userId}`);
-      const user = await this.userModel.findById(userId).exec();
+      const user = await this.userRepository.findById(userId);
       if (!user) {
-        this.logger.warn(`User not found with ID: ${userId}`);
-        const payload = createExceptionPayload(ExceptionPayloadFactory.USER_NAME_NOT_FOUND);
-        throw new BusinessException(payload);
+        const message = `User with ID '${userId}' not found`;
+        this.logger.error(message);
+        throw new HttpException(message, HttpStatus.NOT_FOUND);
       }
       return this.mapUserToGetUserEvent(user);
     } catch (error) {
@@ -173,7 +172,12 @@ export class UserServiceService {
   }
 
   async getAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    try {
+      return await this.userRepository.findAll();
+    } catch (error) {
+      this.logger.error('Error fetching all users:', error.message);
+      throw error;
+    }
   }
 
   private async mapUserToGetUserEvent(user: User): Promise<GetUserEvent> {
@@ -186,9 +190,9 @@ export class UserServiceService {
 
   async findUserByEmail(email: string): Promise<User | null> {
     try {
-      return this.userModel.findOne({ email }).exec();
+      return await this.userModel.findOne({ email }).exec();
     } catch (error) {
-      console.error(`Error finding user by email ${email}:`, error);
+      this.logger.error(`Error finding user by email ${email}: ${error.message}`);
       throw error;
     }
   }

@@ -1,4 +1,4 @@
-import { Inject, Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
+import { Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
 import { UserServiceController } from './user-service.controller';
 import { UserServiceService } from './user-service.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,6 +7,7 @@ import forFeatureDb from './auth/config/for-feature.db';
 import { DatabaseModule } from '@app/database';
 import * as dotenv from 'dotenv';
 import { EmailService } from './email.service';
+import { UserRepository } from './repository/user.repository';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ dotenv.config();
     forwardRef(() => AuthModule),
   ],
   controllers: [UserServiceController],
-  providers: [UserServiceService, EmailService],
+  providers: [UserServiceService, EmailService, UserRepository],
   exports: [UserServiceService],
 })
 export class UserServiceModule implements OnModuleInit{

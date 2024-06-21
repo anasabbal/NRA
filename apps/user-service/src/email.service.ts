@@ -5,8 +5,6 @@ import * as dotenv from 'dotenv';
 import * as nodemailer from 'nodemailer';
 import { VerificationTokenDocument, VerificationToken } from './models/email.confirmation';
 
-
-
 dotenv.config();
 
 @Injectable()
@@ -56,7 +54,14 @@ export class EmailService {
   }
 
   private async findEmailVerification(email: string): Promise<VerificationToken | null> {
-    return await this.verificationTokenModel.findOne({ email }).exec();
+    try {
+      const result = await this.verificationTokenModel.findOne({ email }).exec();
+      this.logger.debug(`Email verification found for ${email}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Error finding email verification: ${error.message}`);
+      throw error;
+    }
   }
 
   private isRecentlySent(timestamp: Date): boolean {
@@ -130,6 +135,11 @@ export class EmailService {
   async findEmailConfirmationWithToken(token: string): Promise<VerificationToken | null> {
     try {
       const emailConfirmation = await this.verificationTokenModel.findOne({ token }).exec();
+      if (emailConfirmation) {
+        this.logger.debug(`Email confirmation found for token: ${token}`);
+      } else {
+        this.logger.debug(`Email confirmation not found for token: ${token}`);
+      }
       return emailConfirmation;
     } catch (error) {
       this.logger.error(`Error finding email confirmation: ${error.message}`);
