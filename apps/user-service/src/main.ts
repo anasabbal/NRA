@@ -3,8 +3,11 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { UserServiceModule } from './user-service.module';
 import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
+import { Logger } from '@nestjs/common';
 
 dotenv.config();
+
+const logger = new Logger();
 
 
 async function testSMTPConnection() {
@@ -20,11 +23,12 @@ async function testSMTPConnection() {
 
   try {
       await transporter.verify(); // Verify connection configuration
-      console.log('SMTP connection successful.');
+      logger.log('SMTP connection successful.');
   } catch (error) {
-      console.error('Error connecting to SMTP server:', error);
+      logger.error('Error connecting to SMTP server:', error);
   }
 }
+
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     UserServiceModule,
