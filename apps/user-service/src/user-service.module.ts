@@ -18,7 +18,7 @@ dotenv.config();
 @Module({
   imports: [
     MongooseModule.forFeature(forFeatureDb),
-    DatabaseModule.forRoot(process.env.MONGODB_URI, 'user'),
+    DatabaseModule.forRoot(process.env.MONGODB_URI, 'user', "mongodb"),
     forwardRef(() => AuthModule),
   ],
   controllers: [UserServiceController],

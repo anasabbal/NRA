@@ -11,7 +11,7 @@ import { DriverService } from "./driver-service";
 
 @Injectable()
 export class AuthService {
-    constructor(
+    /*constructor(
         @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
         private readonly userService: UserService,
         private readonly driverService: DriverService
@@ -64,5 +64,5 @@ export class AuthService {
       }catch(error){
         throw new InternalServerErrorException('Failed to Verify');
       }
-    }
+    }*/ 
 }
