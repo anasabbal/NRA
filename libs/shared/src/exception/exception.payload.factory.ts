@@ -11,14 +11,8 @@ enum ExceptionPayloadFactory {
     CUSTOMER_NOT_FOUND = 6,
     DRIVER_NOT_FOUND = 7,
     DRIVER_LOCATION_NOT_FOUND = 8,
-    CAR_NOT_FOUND = 9,
-    LOCATION_NOT_FOUND = 10,
-    RATING_NOT_FOUND = 11,
-    ORDER_NOT_FOUND = 12,
-    BANK_ACCOUNT_NOT_FOUND = 13,
-    WALLET_NOT_FOUND = 14,
-    CREDIT_CARD_NOT_FOUND = 15,
-    WALLER_FOR_ACCOUNT_NOT_FOUND = 16
+    USER_TYPE_NOT_FOUND = 9,
+    
 }
 
 const exceptionPayloadDetails: { [key in ExceptionPayloadFactory]: { status: HttpStatus, message: string } } = {
@@ -31,14 +25,7 @@ const exceptionPayloadDetails: { [key in ExceptionPayloadFactory]: { status: Htt
     [ExceptionPayloadFactory.CUSTOMER_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'customer.not.found' },
     [ExceptionPayloadFactory.DRIVER_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'driver.not.found' },
     [ExceptionPayloadFactory.DRIVER_LOCATION_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'driver.location.not.found' },
-    [ExceptionPayloadFactory.CAR_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'car.not.found' },
-    [ExceptionPayloadFactory.LOCATION_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'location.not.found' },
-    [ExceptionPayloadFactory.RATING_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'rating.not.found' },
-    [ExceptionPayloadFactory.ORDER_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'order.not.found' },
-    [ExceptionPayloadFactory.BANK_ACCOUNT_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'bank.account.not.found' },
-    [ExceptionPayloadFactory.WALLET_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'wallet.not.found' },
-    [ExceptionPayloadFactory.CREDIT_CARD_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'credit.card.not.found' },
-    [ExceptionPayloadFactory.WALLER_FOR_ACCOUNT_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'wallet.for.account.not.found' },
+    [ExceptionPayloadFactory.USER_TYPE_NOT_FOUND]: { status: HttpStatus.NOT_FOUND, message: 'user.type.not.found' }
 };
 
 function createExceptionPayload(type: ExceptionPayloadFactory): ExceptionPayload {

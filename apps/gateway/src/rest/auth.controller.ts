@@ -11,9 +11,9 @@ import { ResponseSuccess } from '@app/shared/dto/response.dto';
 
 
 
-@Controller('auth')
+@Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  /*constructor(private readonly authService: AuthService) {}
 
 
   @Post('register/:userTypeId')
@@ -35,5 +35,5 @@ export class AuthController {
     } catch (error) {
       throw error;
     }
-  }
+  }*/
 }

@@ -1,44 +1,27 @@
-import { ApiOperation } from "@nestjs/swagger";
-import { UserService } from "../services/user-service";
-import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
-import { GetUserEvent } from "@app/shared/events/user/user.get";
-import { UserTypeDto } from "@app/shared/events/user/user.type.dto";
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
+import { UserService } from '../services/user-service';
 
 
 
-
-@Controller('users')
+@Controller('user')
 export class UserController {
-  
-  constructor(private readonly userService: UserService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  async getAllUsers(): Promise<any[]> {
-    return await this.userService.getAll();
-  }
+    constructor(private readonly userService: UserService) {}
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get User by id' })
-  async getUserById(@Param('id') userId: string): Promise<GetUserEvent> {
-    const user = await this.userService.getById(userId);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+    @Get(':id')
+    async findUserById(@Param('id') id: string): Promise<any> {
+        return this.userService.findUserById(id);
     }
-    return user;
-  }
-  @Get('type/:id')
-  @ApiOperation({ summary: 'Get User Type by id' })
-  async getUserTypeById(@Param('id') userTypeById: string): Promise<UserTypeDto> {
-    const user = await this.userService.findUserTypeById(userTypeById);
-    if (!user) {
-      throw new NotFoundException(`User type with ID ${userTypeById} not found`);
+
+    @Get()
+    async getAllUsers(): Promise<any[]> {
+        return this.userService.getAllUsers();
     }
-    return user;
-  }
-  @Get('profile')
-  @ApiOperation({ summary: 'Get current user' })
-  async getCurrentUser(): Promise<any> {
-    return this.userService.getCurrentProfile();
-  }
+
+    // Example of handling a POST request to create a user
+    @Post()
+    async createUser(@Body() command: UserCreateCommand): Promise<any> {
+        return this.userService.createUser(command);
+    }
 }

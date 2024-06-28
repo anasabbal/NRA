@@ -1,52 +1,41 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import * as bcrypt from 'bcrypt';
-import { Driver } from './models/driver.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { DriverStatus } from './enums/driver.status';
-import { DriverCreateCmd } from '@app/shared/commands/driver/driver.create.cmd';
+import { Driver } from './models/driver.entity';
+
+
 
 @Injectable()
 export class DriverService {
 
   private readonly logger = new Logger(DriverService.name);
+
   constructor(
-    @InjectModel('Driver') private readonly driverModel: Model<Driver>
-  ){}
+    @InjectRepository(Driver)
+    private readonly driverRepository: Repository<Driver>
+  ) {}
 
-  async createDriver(driverCmd: DriverCreateCmd): Promise<Driver> {
-    this.logger.log(`Begin creating driver with payload: ${JSON.stringify(driverCmd)}`);
+  async createDriver(userId: string): Promise<Driver> {
+    this.logger.log(`Begin creating driver with userId: ${userId}`);
 
-    const hashedPassword = await this.hashPassword(driverCmd.password);
-    const driverData = this.buildDriverData(driverCmd, hashedPassword);
-    
-    const savedDriver = await this.saveDriver(driverData);
-    
-    this.logger.log(`Driver with firstName created: ${JSON.stringify(savedDriver)}`);
+    const driverData = this.buildDriverData(userId);
+
+    const savedDriver = await this.driverRepository.save(driverData);
+
+    this.logger.log(`Driver with userId created: ${JSON.stringify(savedDriver)}`);
     return savedDriver;
   }
 
-  private async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
-  }
-
-  private buildDriverData(driverCmd: DriverCreateCmd, hashedPassword: string): Partial<Driver> {
+  private buildDriverData(userId: string): Partial<Driver> {
     return {
-      email: driverCmd.email,
-      password: hashedPassword,
-      firstName: driverCmd.firstName,
-      lastName: driverCmd.lastName,
-      driverStatus: DriverStatus.EMPTY,
+      user_id: userId
     };
   }
 
-  private async saveDriver(driverData: Partial<Driver>): Promise<Driver> {
-    const driver = new this.driverModel(driverData);
-    return driver.save();
-  }
   async findAllDrivers(): Promise<Driver[]> {
     try {
-      return await this.driverModel.find().exec();
+      return await this.driverRepository.find();
     } catch (error) {
       this.logger.error(`Error while fetching drivers from database: ${error.message}`);
       throw error;
@@ -54,7 +43,6 @@ export class DriverService {
   }
 
   async findAllSortedByStatus(): Promise<Driver[]> {
-
     try {
       const drivers = await this.findAllDrivers();
       const order = [
@@ -71,6 +59,7 @@ export class DriverService {
       throw error;
     }
   }
+
   private sortDriversByStatus(drivers: Driver[], order: DriverStatus[]): Driver[] {
     try {
       // create a custom sort function based on the order array
@@ -87,6 +76,4 @@ export class DriverService {
       throw error;
     }
   }
-
-  
 }
