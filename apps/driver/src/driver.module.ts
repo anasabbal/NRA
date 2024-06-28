@@ -1,25 +1,22 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@app/database';
-import { MongooseModule } from '@nestjs/mongoose';
 import { DriverController } from './driver.controller';
 import { DriverService } from './driver.service';
-import { Driver, DriverSchema } from './models/driver.schema';
-import { LocationSchema, Location } from './models/location.schema';
-import { VehicleSchema, Vehicle } from './models/vehicle.schema';
 import * as dotenv from 'dotenv';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Driver } from './models/driver.entity';
+
 
 dotenv.config();
 
 @Module({
   imports: [
-    MongooseModule.forFeature(
-      [
-        { name: Driver.name, schema: DriverSchema },
-        { name: Location.name, schema: LocationSchema },
-        { name: Vehicle.name, schema: VehicleSchema }
-      ]
-    ), 
-    DatabaseModule.forRoot(process.env.MONGODB_URI, 'drivers'),
+    TypeOrmModule.forFeature([Driver]),
+    DatabaseModule.forRoot(
+      process.env.DATABASE_URI,
+      process.env.DATABASE_NAME,
+      process.env.DATABASE_TYPE as 'mongodb' | 'postgres'
+    ),
   ],
   controllers: [DriverController],
   providers: [DriverService],
