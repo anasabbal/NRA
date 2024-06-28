@@ -34,6 +34,14 @@ import { AuthService } from './services/auth.service';
           port: 3002, // port of user-service
         },
       },
+      {
+        name: 'AUTH_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 3005, // port of user-service
+        },
+      },
     ]),
     WinstonModule.forRoot({
       transports: [
