@@ -10,6 +10,8 @@ import { DriversController } from './rest/driver.controller';
 import { UserService } from './services/user-service';
 import { DriverService } from './services/driver-service';
 import { AuthService } from './services/auth.service';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -43,6 +45,10 @@ import { AuthService } from './services/auth.service';
         },
       },
     ]),
+    CacheModule.register({
+      ttl: 5, // seconds
+      max: 100, // maximum number of items in cache
+    }),
     WinstonModule.forRoot({
       transports: [
         new winston.transports.Console({
@@ -55,6 +61,14 @@ import { AuthService } from './services/auth.service';
     }),
   ],
   controllers: [AuthController, UserController, DriversController],
-  providers: [UserService, DriverService, AuthService]
+  providers: [
+    UserService,
+    DriverService,
+    AuthService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+  ],
 })
 export class GatewayModule {}
