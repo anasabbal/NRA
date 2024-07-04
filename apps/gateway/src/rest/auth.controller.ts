@@ -11,12 +11,17 @@ import { ResponseSuccess } from '@app/shared/dto/response.dto';
 
 
 
-@Controller()
+@Controller('auth')
 export class AuthController {
-  /*constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
 
-  @Post('register/:userTypeId')
+
+  @Post('register')
+  async REGISTER(@Body() command: any) : Promise<any>{
+      return this.authService.auth(command);
+  }
+  /*@Post('register/:userTypeId')
   async register(@Body() createUserDto: UserCreateCommand | DriverCreateCmd,
                  @Param('userTypeId') userTypeId: string
                 ) {

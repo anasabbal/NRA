@@ -11,13 +11,14 @@ import { DriverService } from "./driver-service";
 
 @Injectable()
 export class AuthService {
-    /*constructor(
+    constructor(
         @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
         private readonly userService: UserService,
-        private readonly driverService: DriverService
+        private readonly driverService: DriverService,
+        @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy
     ){}
 
-    async register(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<string> {
+    /*async register(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<string> {
         try {
           const userType = await this.userService.findUserTypeById(userTypeId);
           console.log(`User type with id ${userType.id} found`);
@@ -39,8 +40,11 @@ export class AuthService {
             throw new InternalServerErrorException('Failed to register user');
           }
         }
+    }*/
+    async auth(command: UserCreateCommand) : Promise<any> {
+      return await this.authClient.send({cmd: 'register-auth'}, command).toPromise();
     }
-    async login(loginUserDto: any): Promise<any> {
+    /*async login(loginUserDto: any): Promise<any> {
         try {
             const result = await this.userClient.send({ cmd: 'login' }, loginUserDto).toPromise();
             return result;
