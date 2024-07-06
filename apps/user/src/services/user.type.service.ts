@@ -4,6 +4,8 @@ import { UserType } from "../model/user.type";
 import { Repository } from "typeorm";
 import { throwException } from "@app/shared/exception/exception.util";
 import { ExceptionPayloadFactory } from "@app/shared/exception/exception.payload.factory";
+import { mapUserTypeToUserTypeDto } from "../utils";
+import { UserTypeDto } from "@app/shared/events/user/user.type.dto";
 
 
 
@@ -47,7 +49,7 @@ export class UserTypeService {
         }
     }
     
-    async findUserTypeById(id: string): Promise<UserType> {
+    async findUserTypeById(id: string): Promise<UserTypeDto> {
         this.logger.log(`Begin fetching user type with id ${id}`);
         const userType = await this.userTypeRepository.findOne({ where: { id } });
     
@@ -56,12 +58,13 @@ export class UserTypeService {
           throwException(ExceptionPayloadFactory.USER_TYPE_NOT_FOUND);
         }
         this.logger.log(`User type fetched successfully with id ${id}`);
-        return userType;
+        return mapUserTypeToUserTypeDto(userType);
     }
-    async getUserTypes(): Promise<UserType[]> {
+    async getUserTypes(): Promise<UserTypeDto[]> {
       this.logger.log(`Begin fetching user types`);
       try {
-        return await this.userTypeRepository.find();
+        const userTypes = await this.userTypeRepository.find();
+        return userTypes.map(mapUserTypeToUserTypeDto);
       } catch (error) {
         this.logger.error('Error fetching all user types:', error.message);
         throw error;
