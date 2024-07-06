@@ -27,7 +27,7 @@ export class User {
     @Column({ type: 'varchar', nullable: false })
     password: string;
 
-    @ManyToOne(() => UserType, { eager: true, nullable: false })
+    @ManyToOne(() => UserType, { eager: true, nullable: true })
     @JoinColumn({ name: 'userTypeId' })
     userType: UserType;
 

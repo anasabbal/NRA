@@ -88,7 +88,9 @@ export class UserService {
   async getAll(): Promise<User[]> {
     this.logger.log(`Begin fetching users`);
     try {
-      return await this.userRepository.find();
+      const users = await this.userRepository.find();
+      this.logger.log(`Fetched users: ${JSON.stringify(users)}`);
+      return users;
     } catch (error) {
       this.logger.error('Error fetching all users:', error.message);
       throw error;
