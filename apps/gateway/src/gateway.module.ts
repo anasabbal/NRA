@@ -12,6 +12,8 @@ import { DriverService } from './services/driver-service';
 import { AuthService } from './services/auth.service';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { UserTypeService } from './services/user.type.service';
+import { UserTypeController } from './rest/user.type.controller';
 
 @Module({
   imports: [
@@ -60,11 +62,12 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       ],
     }),
   ],
-  controllers: [AuthController, UserController, DriversController],
+  controllers: [AuthController, UserController, DriversController, UserTypeController],
   providers: [
     UserService,
     DriverService,
     AuthService,
+    UserTypeService,
     {
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor,

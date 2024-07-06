@@ -1,9 +1,11 @@
 import { UserCreateCommand } from "@app/shared/commands/auth/user.create.cmd";
 import { DriverCreateCmd } from "@app/shared/commands/driver/driver.create.cmd";
-import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, UnauthorizedException } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { UserService } from "./user-service";
 import { DriverService } from "./driver-service";
+import { UserTypeService } from "./user.type.service";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 
 
@@ -12,61 +14,26 @@ import { DriverService } from "./driver-service";
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
         private readonly userService: UserService,
         private readonly driverService: DriverService,
-        @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy
+        private readonly userTypeService: UserTypeService,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
     ){}
 
-    /*async register(userTypeId: string, command: UserCreateCommand | DriverCreateCmd): Promise<string> {
-        try {
-          const userType = await this.userService.findUserTypeById(userTypeId);
-          console.log(`User type with id ${userType.id} found`);
-          if(userType.id == userTypeId){
-            return await this.userService.createUser(command, userTypeId);
-          }else {
-            return await this.userService.createUser(command, userTypeId);
-          }
-        } catch (error) {
-          // log the error for debugging purposes
-          console.error('Error occurred during user registration:', error);
-          // decide how to handle different types of errors
-          if (error.response && error.response.status === 409) {
-            throw new ConflictException('User with this email already exists');
-          } else if (error.response && error.response.status === 400) {
-            throw new BadRequestException('Invalid user data provided');
-          } else {
-            // if the error is unexpected, throw an Internal Server Error
-            throw new InternalServerErrorException('Failed to register user');
-          }
-        }
-    }*/
-    async auth(command: UserCreateCommand) : Promise<any> {
-      return await this.authClient.send({cmd: 'register-auth'}, command).toPromise();
-    }
-    /*async login(loginUserDto: any): Promise<any> {
-        try {
-            const result = await this.userClient.send({ cmd: 'login' }, loginUserDto).toPromise();
-            return result;
-        } catch (error) {
-            // log the error for debugging purposes
-            console.error('Error occurred during user login:', error);
-            
-            // decide how to handle different types of errors
-            if (error.response && error.response.status === 401) {
-                throw new UnauthorizedException('Invalid credentials');
-            } else {
-                // if the error is unexpected, throw an Internal Server Error
-                throw new InternalServerErrorException('Failed to login');
-            }
-        }
-    }
-    async verifyUser(token: string): Promise<any> {
+    async register(userTypeId: string, cmd: any): Promise<any> {
       try {
-        const result = await this.userClient.send({ cmd: 'verify-user'}, token).toPromise();
-        return result;
-      }catch(error){
-        throw new InternalServerErrorException('Failed to Verify');
+        const userType = await this.userTypeService.findUserTypeById(userTypeId);
+    
+        if (userType.name === 'Driver') {
+          return await this.driverService.createDriver(cmd);
+        } else if (userType.name === 'User') {
+          return await this.userService.createUser(cmd);
+        } else {
+          throw new Error(`Unknown user type: ${userType.name}`);
+        }
+      } catch (error) {
+        this.logger.error(`Error registering user with userTypeId ${userTypeId}: ${error.message}`);
+        throw error;
       }
-    }*/ 
+    }
 }
