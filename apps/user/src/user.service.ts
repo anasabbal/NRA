@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './model/user.entity';
+import { Cache } from 'cache-manager';
 import { Repository } from 'typeorm';
 import { ExceptionPayloadFactory } from '@app/shared/exception/exception.payload.factory';
 import { throwException } from '@app/shared/exception/exception.util';
@@ -8,6 +9,7 @@ import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 import { hashPassword } from '@app/shared/utils/hash.pass';
 import { validateCommand } from '@app/shared/utils/validate';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 
 
@@ -20,6 +22,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {
     this.driverServiceClient = ClientProxyFactory.create({
       transport: Transport.TCP, // Choose your transport protocol
@@ -76,20 +80,37 @@ export class UserService {
   }
   async findUserById(id: string): Promise<User> {
     this.logger.log(`Begin fetching user with id ${id}`);
+    
+    const cachedUser = await this.cacheManager.get<User>(`user-${id}`);
+    if (cachedUser) {
+      this.logger.log(`User fetched from cache with id ${id}`);
+      return cachedUser;
+    }
+
     const user = await this.userRepository.findOne({ where: {id}});
 
-    if(!user){
+    if (!user) {
       this.logger.error(`User with id ${id} not found`);
       throwException(ExceptionPayloadFactory.USER_NAME_NOT_FOUND);
     }
+
     this.logger.log(`User fetched successfully with id ${id}`);
+    await this.cacheManager.set(`user-${id}`, user, 600); // cache for 10 minutes
     return user;
   }
   async getAll(): Promise<User[]> {
     this.logger.log(`Begin fetching users`);
+    
+    const cachedUsers = await this.cacheManager.get<User[]>('all-users');
+    if (cachedUsers) {
+      this.logger.log(`Users fetched from cache`);
+      return cachedUsers;
+    }
+
     try {
       const users = await this.userRepository.find();
       this.logger.log(`Fetched users: ${JSON.stringify(users)}`);
+      await this.cacheManager.set('all-users', users, 600 ); // cache for 10 minutes
       return users;
     } catch (error) {
       this.logger.error('Error fetching all users:', error.message);
