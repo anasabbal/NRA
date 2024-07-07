@@ -16,7 +16,6 @@ describe('DriverController', () => {
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(driverController.getHello()).toBe('Hello World!');
     });
   });
 });

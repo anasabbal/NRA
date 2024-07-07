@@ -5,8 +5,8 @@ import { User } from '../model/user.entity';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Repository } from 'typeorm';
-import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { ExceptionPayloadFactory, createExceptionPayload } from '@app/shared/exception/exception.payload.factory';
+import { ClientProxy, ClientProxyFactory } from '@nestjs/microservices';
+import { ExceptionPayloadFactory, createExceptionPayload } from '@libs/shared/src/exception/exception.payload.factory';
 
 
 
