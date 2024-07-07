@@ -5,6 +5,7 @@ import { DriverService } from './driver.service';
 import * as dotenv from 'dotenv';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Driver } from './models/driver.entity';
+import { CacheModule } from '@nestjs/cache-manager';
 
 
 dotenv.config();
@@ -17,6 +18,10 @@ dotenv.config();
       process.env.DATABASE_NAME,
       process.env.DATABASE_TYPE as 'mongodb' | 'postgres'
     ),
+    CacheModule.register({
+      ttl: 60, // seconds
+      max: 100, // maximum number of items in cache
+    }),
   ],
   controllers: [DriverController],
   providers: [DriverService],

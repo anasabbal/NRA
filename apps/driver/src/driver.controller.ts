@@ -1,7 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { DriverService } from './driver.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { DriverDto } from '@app/shared/events/driver/driver.dto';
 import { Driver } from './models/driver.entity';
 
 @Controller('drivers')
