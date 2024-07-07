@@ -18,12 +18,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/user-events": [
-        "libs/user-events/src"
-      ],
-      "@app/user-events/*": [
-        "libs/user-events/src/*"
-      ],
       "@app/common": [
         "libs/common/src"
       ],

@@ -9,7 +9,6 @@ import { UserType } from './model/user.type';
 import { UserTypeController } from './services/user.type.controller';
 import { UserTypeService } from './services/user.type.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { CacheModule } from '@nestjs/cache-manager';
 
 dotenv.config();
 
@@ -35,10 +34,6 @@ dotenv.config();
         },
       },
     ]),
-    CacheModule.register({
-      ttl: 60, // seconds
-      max: 100, // maximum number of items in cache
-    }),
   ],
   controllers: [UserController, UserTypeController],
   providers: [UserService, UserTypeService]

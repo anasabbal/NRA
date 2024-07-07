@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './model/user.entity';
 import { Cache } from 'cache-manager';
 import { Repository } from 'typeorm';
-import { ExceptionPayloadFactory } from '@app/shared/exception/exception.payload.factory';
 import { throwException } from '@app/shared/exception/exception.util';
 import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 import { hashPassword } from '@app/shared/utils/hash.pass';
 import { validateCommand } from '@app/shared/utils/validate';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ExceptionPayloadFactory } from '@app/shared/exception/exception.payload.factory';
 
 
 
@@ -53,14 +53,14 @@ export class UserService {
       throwException(ExceptionPayloadFactory.TECHNICAL_ERROR);
     }
   }
-  private async checkIfEmailExists(email: string): Promise<void> {
+  public async checkIfEmailExists(email: string): Promise<void> {
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
       this.logger.error(`User with email ${email} already exists`);
       throwException(ExceptionPayloadFactory.EMAIL_ALREADY_EXIST);
     }
   }
-  private async saveUser(command: UserCreateCommand, hashedPassword: string): Promise<User> {
+  public async saveUser(command: UserCreateCommand, hashedPassword: string): Promise<User> {
     const { firstName, lastName, email } = command;
     const newUser = this.userRepository.create({
       firstName,
