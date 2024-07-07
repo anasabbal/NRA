@@ -1,8 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DriverStatus } from './enums/driver.status';
 import { Driver } from './models/driver.entity';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 
 
@@ -13,7 +15,9 @@ export class DriverService {
 
   constructor(
     @InjectRepository(Driver)
-    private readonly driverRepository: Repository<Driver>
+    private readonly driverRepository: Repository<Driver>,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   async createDriver(userId: string): Promise<Driver> {
@@ -34,8 +38,21 @@ export class DriverService {
   }
 
   async findAllDrivers(): Promise<Driver[]> {
+    this.logger.log('Begin fetching all drivers');
+
+    const cacheKey = 'all-drivers';
+    const cachedDrivers = await this.cacheManager.get<Driver[]>(cacheKey);
+    
+    if (cachedDrivers) {
+      this.logger.log('Drivers fetched from cache');
+      return cachedDrivers;
+    }
+
     try {
-      return await this.driverRepository.find();
+      const drivers = await this.driverRepository.find();
+      await this.cacheManager.set(cacheKey, drivers, 600 ); // cache for 10 minutes
+      this.logger.log('Drivers fetched from database and cached');
+      return drivers;
     } catch (error) {
       this.logger.error(`Error while fetching drivers from database: ${error.message}`);
       throw error;
@@ -43,6 +60,16 @@ export class DriverService {
   }
 
   async findAllSortedByStatus(): Promise<Driver[]> {
+    this.logger.log('Begin fetching and sorting all drivers by status');
+
+    const cacheKey = 'all-drivers-sorted-by-status';
+    const cachedSortedDrivers = await this.cacheManager.get<Driver[]>(cacheKey);
+    
+    if (cachedSortedDrivers) {
+      this.logger.log('Sorted drivers fetched from cache');
+      return cachedSortedDrivers;
+    }
+
     try {
       const drivers = await this.findAllDrivers();
       const order = [
@@ -52,7 +79,8 @@ export class DriverService {
         DriverStatus.THREE_SET_AVAILABLE,
       ];
       const sortedDrivers = this.sortDriversByStatus(drivers, order);
-
+      await this.cacheManager.set(cacheKey, sortedDrivers, 600 ); // cache for 10 minutes
+      this.logger.log('Sorted drivers fetched from database and cached');
       return sortedDrivers;
     } catch (error) {
       this.logger.error(`Error while fetching and sorting drivers: ${error.message}`);
