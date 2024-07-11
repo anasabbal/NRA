@@ -34,11 +34,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
+      - run: npm test
 
-      - name: Run tests for all apps
-        run: npm run test
         
       - name: Install dependencies for ${{ matrix.app }}
         working-directory: apps/${{ matrix.app }}
