@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Ride } from './models/ride.schema';
-import { RequestDriver } from '@app/common/ride/cmd/request.driver';
 
 
 
@@ -13,7 +12,7 @@ export class RideService {
 
 
 
-  async requestDrive(request: RequestDriver): Promise<any> {
-
+  getHello(): string {
+    return 'Hello World!';
   }
 }

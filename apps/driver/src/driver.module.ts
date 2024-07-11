@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from '@app/database';
 import { DriverController } from './driver.controller';
 import { DriverService } from './driver.service';
 import * as dotenv from 'dotenv';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Driver } from './models/driver.entity';
 import { CacheModule } from '@nestjs/cache-manager';
+import { DatabaseModule } from '@app/database';
 
 
 dotenv.config();

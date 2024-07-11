@@ -1,7 +1,7 @@
-import { UserTypeDto } from "@app/shared/events/user/user.type.dto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { UserTypeDto } from "../dto/user.type.dto";
 
 
 

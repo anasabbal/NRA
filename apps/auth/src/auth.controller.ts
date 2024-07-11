@@ -1,7 +1,7 @@
 import { Body, Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
+import { UserCreateCommand } from './command/create.user.command';
 
 @Controller()
 export class AuthController {

@@ -1,9 +1,8 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Cache } from 'cache-manager';
-import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd'; // Adjust import path as needed
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { UserCreateCommand } from '../command/create.user.command';
 
 @Injectable()
 export class UserService {

@@ -49,9 +49,6 @@ jobs:
       working-directory: apps/${{ matrix.app }}
       run: nest start ${{ matrix.app }} &
 
-    #- name: Wait for service to be ready
-    #  run: sleep 10
-
-    #- name: Run tests for ${{ matrix.app }}
-    #  working-directory: apps/${{ matrix.app }}
-    #  run: npm run test
+    - name: Run tests for ${{ matrix.app }}
+      working-directory: apps/${{ matrix.app }}
+      run: npm run test

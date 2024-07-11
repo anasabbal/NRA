@@ -1,11 +1,8 @@
-import { UserCreateCommand } from "@app/shared/commands/auth/user.create.cmd";
-import { DriverCreateCmd } from "@app/shared/commands/driver/driver.create.cmd";
-import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, UnauthorizedException } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
 import { UserService } from "./user-service";
 import { DriverService } from "./driver-service";
 import { UserTypeService } from "./user.type.service";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 
 
 

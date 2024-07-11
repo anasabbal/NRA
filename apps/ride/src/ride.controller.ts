@@ -6,4 +6,8 @@ export class RideController {
   constructor(private readonly rideService: RideService) {}
 
   
+  @Get()
+  getHello(): string {
+    return this.rideService.getHello();
+  }
 }

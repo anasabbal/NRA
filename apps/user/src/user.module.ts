@@ -2,7 +2,6 @@ import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import * as dotenv from 'dotenv';
-import { DatabaseModule } from '@app/database';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './model/user.entity';
 import { UserType } from './model/user.type';
@@ -10,6 +9,7 @@ import { UserTypeController } from './services/user.type.controller';
 import { UserTypeService } from './services/user.type.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CacheModule } from '@nestjs/cache-manager';
+import { DatabaseModule } from '@app/database';
 
 dotenv.config();
 

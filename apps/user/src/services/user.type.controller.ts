@@ -1,8 +1,8 @@
 import { Controller } from "@nestjs/common";
 import { UserTypeService } from "./user.type.service";
 import { MessagePattern } from "@nestjs/microservices";
-import { UserType } from "../model/user.type";
-import { UserTypeDto } from "@app/shared/events/user/user.type.dto";
+import { UserTypeDto } from "../dto/user.type.dto";
+
 
 
 

@@ -2,8 +2,10 @@ import { Controller } from '@nestjs/common';
 import { UserServiceService } from './user-service.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { User } from './models/user.schema';
-import { GetUserEvent } from '@app/shared/events/user/user.get';
-import { UserTypeDto } from '@app/shared/events/user/user.type.dto';
+import { GetUserEvent } from './utils/user.get';
+import { UserTypeDto } from './utils/user.type.dto';
+
+
 
 
 @Controller('users')
