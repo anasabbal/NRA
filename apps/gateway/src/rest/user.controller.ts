@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common';
-import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
 import { UserService } from '../services/user-service';
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { UserCreateCommand } from '../command/create.user.command';
 
 
 

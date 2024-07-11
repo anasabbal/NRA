@@ -2,10 +2,8 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserType } from "../model/user.type";
 import { Repository } from "typeorm";
-import { throwException } from "@app/shared/exception/exception.util";
-import { ExceptionPayloadFactory } from "@app/shared/exception/exception.payload.factory";
 import { mapUserTypeToUserTypeDto } from "../utils";
-import { UserTypeDto } from "@app/shared/events/user/user.type.dto";
+import { UserTypeDto } from "../dto/user.type.dto";
 
 
 
@@ -55,7 +53,7 @@ export class UserTypeService {
     
         if (!userType) {
           this.logger.error(`UserType with id ${id} not found`);
-          throwException(ExceptionPayloadFactory.USER_TYPE_NOT_FOUND);
+          throw new Error();
         }
         this.logger.log(`User type fetched successfully with id ${id}`);
         return mapUserTypeToUserTypeDto(userType);

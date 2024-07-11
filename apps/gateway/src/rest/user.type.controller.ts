@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { UserTypeService } from '../services/user.type.service';
-import { UserTypeDto } from '@app/shared/events/user/user.type.dto';
+import { UserTypeDto } from '../dto/user.type.dto';
 
 
 

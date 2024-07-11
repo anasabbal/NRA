@@ -3,13 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './model/user.entity';
 import { Cache } from 'cache-manager';
 import { Repository } from 'typeorm';
-import { ExceptionPayloadFactory } from '@app/shared/exception/exception.payload.factory';
-import { throwException } from '@app/shared/exception/exception.util';
-import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
-import { hashPassword } from '@app/shared/utils/hash.pass';
-import { validateCommand } from '@app/shared/utils/validate';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { UserCreateCommand } from './command/user.create.cmd';
+import { validate } from 'class-validator';
+import { hashPassword } from './util/hash.pass';
 
 
 
@@ -35,7 +33,7 @@ export class UserService {
 
 
   async createUser(command: UserCreateCommand): Promise<User> {
-    await validateCommand(command);
+    await validate(command);
     await this.checkIfEmailExists(command.email);
     const hashedPassword = await hashPassword(command.password);
     const createdUser = await this.saveUser(command, hashedPassword);
@@ -50,14 +48,14 @@ export class UserService {
       this.logger.log(`Driver created successfully with response: ${response}`);
     } catch (error) {
       this.logger.error('Error creating driver:', error.message);
-      throwException(ExceptionPayloadFactory.TECHNICAL_ERROR);
+      throw new Error();
     }
   }
   private async checkIfEmailExists(email: string): Promise<void> {
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
       this.logger.error(`User with email ${email} already exists`);
-      throwException(ExceptionPayloadFactory.EMAIL_ALREADY_EXIST);
+      throw new Error();
     }
   }
   private async saveUser(command: UserCreateCommand, hashedPassword: string): Promise<User> {
@@ -75,7 +73,7 @@ export class UserService {
       return savedUser;
     } catch (error) {
       this.logger.error('Error creating user:', error.message);
-      throwException(ExceptionPayloadFactory.TECHNICAL_ERROR);
+      throw new Error();
     }
   }
   async findUserById(id: string): Promise<User> {
@@ -91,7 +89,7 @@ export class UserService {
 
     if (!user) {
       this.logger.error(`User with id ${id} not found`);
-      throwException(ExceptionPayloadFactory.USER_NAME_NOT_FOUND);
+      throw new Error();
     }
 
     this.logger.log(`User fetched successfully with id ${id}`);

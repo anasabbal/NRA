@@ -1,4 +1,4 @@
-import { UserTypeDto } from "@app/shared/events/user/user.type.dto";
+import { UserTypeDto } from "../dto/user.type.dto";
 import { UserType } from "../model/user.type";
 
 

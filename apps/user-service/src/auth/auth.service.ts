@@ -2,8 +2,8 @@ import { BadRequestException, Inject, Injectable, Logger, forwardRef } from '@ne
 import { UserServiceService } from '../user-service.service';
 import { JwtService } from '@nestjs/jwt';
 import { validate } from 'class-validator';
-import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
-import { IResponse } from '@app/shared/interfaces/response.interface';
+import { UserCreateCommand } from '../command/user.create.cmd';
+import { IResponse } from '../utils/response';
 
 
 @Injectable()

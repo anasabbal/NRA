@@ -1,6 +1,5 @@
-import { UserCreateCommand } from '@app/shared/commands/auth/user.create.cmd';
-import { validateCommand } from '@app/shared/utils/validate';
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { UserCreateCommand } from './command/create.user.command';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';

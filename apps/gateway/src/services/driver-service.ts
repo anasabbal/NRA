@@ -1,8 +1,8 @@
-import { DriverCreateCmd } from "@app/shared/commands/driver/driver.create.cmd";
-import { DriverDto } from "@app/shared/events/driver/driver.dto";
 import { Inject, Injectable, Logger, LoggerService } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { DriverCreateCmd } from "../command/driver.cmd";
+import { DriverDto } from "../dto/driver.dto";
 
 
 
