@@ -8,6 +8,7 @@ import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 @Module({})
 export class DatabaseModule {
   
+  
   private static logger = new Logger(DatabaseModule.name);
 
   static forRoot(uri: string, dbName: string, dbType: 'mongodb' | 'postgres'): DynamicModule {
