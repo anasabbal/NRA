@@ -41,14 +41,11 @@ jobs:
       working-directory: apps/${{ matrix.app }}
       run: npm install
 
-    #- name: Build ${{ matrix.app }}
-    #  working-directory: apps/${{ matrix.app }}
-    #  run: npm run build
-
     - name: Start ${{ matrix.app }}
       working-directory: apps/${{ matrix.app }}
       run: nest start ${{ matrix.app }} &
 
-    - name: Run tests for ${{ matrix.app }}
-      working-directory: apps/${{ matrix.app }}
+    - name: Run tests for all apps
       run: npm run test
+
+
