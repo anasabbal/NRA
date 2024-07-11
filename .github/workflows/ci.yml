@@ -45,3 +45,7 @@ jobs:
       working-directory: apps/${{ matrix.app }}
       run: nest start ${{ matrix.app }} &
 
+    - name: Run tests for all apps
+      run: npm run test
+
+
