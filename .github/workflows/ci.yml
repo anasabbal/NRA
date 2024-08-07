@@ -26,26 +26,26 @@ jobs:
         app: [driver, notification, gateway, ride, user-service, auth, user]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Use Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '20'
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
 
-    - name: Install dependencies
-      run: npm install
+      - run: npm install
+      - run: npm test
 
-    - name: Install dependencies for ${{ matrix.app }}
-      working-directory: apps/${{ matrix.app }}
-      run: npm install
+        
+      - name: Install dependencies for ${{ matrix.app }}
+        working-directory: apps/${{ matrix.app }}
+        run: npm install
 
-    - name: Start ${{ matrix.app }}
-      working-directory: apps/${{ matrix.app }}
-      run: nest start ${{ matrix.app }} &
+      - name: Start ${{ matrix.app }}
+        working-directory: apps/${{ matrix.app }}
+        run: nest start ${{ matrix.app }} &
 
-    - name: Run tests for all apps
-      run: npm run test
+      
 
 
